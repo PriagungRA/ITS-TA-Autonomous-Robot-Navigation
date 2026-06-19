@@ -1,0 +1,29 @@
+\begin{center}
+  \large\textbf{ABSTRACT}
+\end{center}
+
+\addcontentsline{toc}{chapter}{ABSTRACT}
+
+\vspace{2ex}
+
+\begingroup
+% Menghilangkan padding
+\setlength{\tabcolsep}{0pt}
+
+\noindent
+\begin{tabularx}{\textwidth}{l >{\centering}m{3em} X}
+  \emph{Name}     & : & \name{}         \\
+
+  \emph{Title}    & : & \engtatitle{}   \\
+
+  \emph{Advisors} & : & 1. \advisor{}   \\
+                  &   & 2. \coadvisor{} \\
+\end{tabularx}
+\endgroup
+
+% [TEMPLATE] Isi paragraf berikut dengan abstrak Bahasa Inggris (terjemahan dari abstrak Indonesia).
+Safe navigation is a critical requirement for autonomous mobile robots, particularly when operating in environments containing static and dynamic obstacles. Although 2D LiDAR is widely used as a primary navigation sensor due to its accurate distance measurement capability, it suffers from limitations in detecting obstacles located outside its scanning plane, resulting in blind-spot regions that may increase the risk of collision. To address this issue, this research proposes an autonomous wheeled robot navigation system based on fuzzy logic and LiDAR-thermal camera sensor fusion to improve environmental perception and navigation safety. The proposed system utilizes a 2D LiDAR to acquire geometric information of the environment and a thermal camera to provide additional information regarding traversable and non-traversable areas. Information from both sensors is processed into LiDAR traversability and thermal traversability, which are subsequently combined through a decision-level fusion approach to generate an effective traversability value. This value is used as the input of a Mamdani fuzzy logic controller to adaptively adjust the parameters of the Artificial Potential Field (APF) navigation method according to the observed environmental conditions. The system is implemented using ROS Noetic and evaluated in the Gazebo simulator through eight testing scenarios involving open environments, static obstacles, low-profile obstacles located within LiDAR blind-spot regions, and dynamic obstacles. Experimental results demonstrate that the proposed method improves navigation reliability and safety compared with the baseline configuration, as indicated by higher Success Rate, Collision-Free Rate, and minimum clearance values, particularly in scenarios involving low-profile and dynamic obstacles. Although the proposed approach results in increased traversal time and path length, it is capable of maintaining a significantly larger safety margin from surrounding obstacles throughout the navigation process. The results indicate that the integration of a thermal camera, traversability-based sensor fusion, and Mamdani fuzzy logic within an APF-based navigation framework effectively enhances environmental perception and navigation safety compared with a navigation system relying solely on LiDAR.
+
+\emph{Keywords}: autonomous mobile robot, 2D LiDAR, thermal camera, traversability, sensor fusion, Mamdani fuzzy logic, Artificial Potential Field.
+
+

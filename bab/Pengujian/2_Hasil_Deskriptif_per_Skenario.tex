@@ -1,0 +1,58 @@
+Subbab ini menyajikan gambaran umum hasil eksperimen yang diperoleh dari seluruh skenario pengujian sebelum dilakukan analisis statistik yang lebih mendalam pada subbab berikutnya. Penyajian secara deskriptif bertujuan untuk memberikan pemahaman awal mengenai karakteristik performa sistem navigasi pada konfigurasi \textit{baseline} maupun konfigurasi \textit{fuzzy}. Fokus pembahasan diarahkan pada tren umum yang muncul selama pengujian, sedangkan evaluasi signifikansi statistik dibahas pada Subbab~4.7.
+
+Sebanyak delapan skenario pengujian telah dilaksanakan sesuai prosedur yang dijelaskan pada Bab~III. Setiap skenario dijalankan sebanyak sepuluh kali percobaan independen sehingga diperoleh total 80 \textit{trial}. Data hasil eksperimen kemudian diolah untuk memperoleh metrik evaluasi yang meliputi tingkat keberhasilan navigasi, \textit{collision-free rate}, \textit{minimum clearance}, waktu navigasi, panjang lintasan, kecepatan linear rata-rata, dan kecepatan angular rata-rata.
+
+\subsection{Ringkasan Hasil Seluruh Skenario}
+
+Tabel~\ref{tab:ringkasan_hasil_deskriptif} menyajikan ringkasan hasil pengujian pada seluruh skenario.
+
+\begin{table}[H]
+\centering
+\caption{Ringkasan hasil deskriptif seluruh skenario pengujian.}
+\label{tab:ringkasan_hasil_deskriptif}
+\begin{tabular}{cccccc}
+\toprule
+Skenario &
+$SR$ (\%) &
+$CFR$ (\%) &
+$c_{min}$ (m) &
+$t_{nav}$ (s) &
+$L$ (m) \\
+\midrule
+S1 & 100 & 100 & 0.000 & 25.50 & 11.26 \\
+S2 & 100 & 100 & 0.430 & 29.72 & 12.03 \\
+S3 & 65  & 65  & 0.035 & 29.51 & 12.15 \\
+S4 & 0   & 0   & -0.164 & 33.47 & 11.79 \\
+S5 & 100 & 100 & 0.000 & 31.04 & 11.25 \\
+S6 & 100 & 100 & 0.437 & 34.35 & 11.94 \\
+S7 & 100 & 100 & 0.182 & 48.26 & 12.87 \\
+S8 & 100 & 100 & 0.317 & 49.97 & 12.41 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Secara umum, seluruh konfigurasi mampu menyelesaikan tugas navigasi dengan baik pada lingkungan yang relatif sederhana. Hal ini ditunjukkan oleh tingkat keberhasilan sebesar 100\% pada skenario S1, S2, S5, dan S6. Pada kondisi tersebut, baik konfigurasi \textit{baseline} maupun konfigurasi \textit{fuzzy} mampu mencapai tujuan tanpa mengalami tabrakan.
+
+Perbedaan performa mulai terlihat ketika kompleksitas lingkungan meningkat. Pada skenario S3 yang melibatkan beberapa obstacle statis serta obstacle berprofil rendah pada area \textit{blind-spot} LiDAR, konfigurasi \textit{baseline} hanya mencapai tingkat keberhasilan sebesar 65\%. Kondisi yang lebih menantang ditunjukkan oleh skenario S4, di mana seluruh percobaan gagal mencapai tujuan tanpa tabrakan. Nilai \textit{minimum clearance} yang negatif pada S4 mengindikasi\-kan bahwa robot mengalami kontak langsung dengan obstacle selama navigasi.
+
+Sebaliknya, seluruh percobaan pada konfigurasi fuzzy (S5--S8) berhasil mencapai tujuan dengan tingkat keberhasilan dan \textit{collision-free rate} sebesar 100\%. Peningkatan tersebut paling terlihat pada pasangan S3--S7 dan S4--S8, yaitu ketika robot harus beroperasi pada lingkungan yang mengandung obstacle berprofil rendah maupun obstacle dinamis.
+
+\subsection{Perbandingan Kelompok Baseline dan Fuzzy}
+
+Perbandingan antara kelompok \textit{baseline} dan \textit{fuzzy} dilakukan menggunakan empat pasangan skenario yang memiliki kondisi lingkungan identik, yaitu S1--S5, S2--S6, S3--S7, dan S4--S8.
+
+Pada pasangan S1--S5 dan S2--S6, kedua konfigurasi menghasilkan performa yang relatif serupa. Seluruh percobaan berhasil mencapai tujuan dan tidak ditemukan tabrakan. Perbedaan utama hanya terlihat pada waktu navigasi yang sedikit lebih tinggi pada konfigurasi fuzzy akibat mekanisme penyesuaian kecepatan yang lebih konservatif.
+
+Perbedaan yang lebih signifikan muncul pada pasangan S3--S7 dan S4--S8. Pada kedua pasangan tersebut, konfigurasi fuzzy menunjukkan peningkatan tingkat keberhasilan yang disertai dengan peningkatan \textit{minimum clearance}. Nilai clearance rata-rata meningkat dari 0,035 m pada S3 menjadi 0,182 m pada S7, serta dari -0,164 m pada S4 menjadi 0,317 m pada S8. Temuan ini menunjukkan bahwa robot mampu mempertahankan jarak aman yang lebih besar terhadap obstacle ketika mekanisme adaptasi fuzzy diaktifkan.
+
+Di sisi lain, peningkatan margin keselamatan tersebut diikuti oleh kenaikan waktu navigasi. Rata-rata waktu tempuh pada S7 dan S8 lebih tinggi dibandingkan pasangan \textit{baseline}-nya, yang mengindikasikan adanya \textit{trade-off} antara keselamatan dan efisiensi navigasi.
+
+\subsection{Observasi Kualitatif Perilaku Navigasi}
+
+Selain metrik kuantitatif, perilaku navigasi robot juga diamati melalui visualisasi trajektori dan pengamatan langsung selama simulasi berlangsung.
+
+Pada konfigurasi \textit{baseline}, robot cenderung mempertahankan kecepatan yang relatif konstan selama bergerak menuju tujuan. Strategi tersebut menghasilkan waktu tempuh yang lebih singkat, namun pada beberapa kondisi menyebabkan robot melakukan manuver penghindaran dengan jarak yang sangat dekat terhadap obstacle. Fenomena ini terutama terlihat pada skenario yang melibatkan obstacle berprofil rendah dan obstacle dinamis.
+
+Sebaliknya, konfigurasi fuzzy menunjukkan perilaku yang lebih adaptif terhadap perubahan kondisi lingkungan. Ketika obstacle terdeteksi pada jarak yang dekat atau traversability lingkungan menurun, robot secara bertahap mengurangi kecepatan dan meningkatkan respons penghindaran obstacle. Akibatnya, robot mampu mempertahankan margin keselamatan yang lebih besar dan mengurangi risiko tabrakan.
+
+Secara keseluruhan, hasil deskriptif menunjukkan bahwa integrasi kamera termal, fusi traversability, dan pengendali fuzzy memberikan kontribusi positif terhadap keamanan navigasi robot, khususnya pada lingkungan yang mengandung obstacle berprofil rendah maupun obstacle dinamis. Temuan awal ini akan dianalisis lebih lanjut secara kuantitatif pada subbab-subbab berikutnya menggunakan metrik evaluasi dan metode statistik yang telah dijelaskan pada Bab~III.

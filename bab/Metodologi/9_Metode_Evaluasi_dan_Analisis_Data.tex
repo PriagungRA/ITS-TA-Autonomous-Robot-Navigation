@@ -1,0 +1,264 @@
+Subbab ini menjelaskan metode evaluasi yang digunakan untuk menilai pengaruh integrasi kamera termal dan pengendali fuzzy terhadap performa sistem navigasi robot. Evaluasi difokuskan pada dua aspek utama, yaitu keamanan navigasi (\textit{safety}) dan efisiensi pergerakan (\textit{efficiency}). Seluruh metrik, prosedur pencatatan data, serta metode analisis statistik dirancang untuk mengevaluasi kontribusi sistem yang diusulkan secara objektif dan dapat direproduksi.
+
+\subsection{Tujuan Evaluasi}
+
+Tujuan evaluasi pada penelitian ini adalah menilai pengaruh integrasi kamera termal dan pengendali fuzzy terhadap performa navigasi robot pada berbagai kondisi lingkungan.
+
+Evaluasi difokuskan pada empat aspek utama, yaitu:
+
+\begin{enumerate}
+\item kemampuan menghindari obstacle pada area \textit{blind-spot} LiDAR;
+\item peningkatan margin keselamatan navigasi yang direpresentasikan oleh nilai \textit{minimum clearance};
+\item pengaruh metode usulan terhadap efisiensi navigasi;
+\item pengaruh metode usulan terhadap stabilitas dan kehalusan pergerakan robot.
+\end{enumerate}
+
+\subsection{Metrik Evaluasi}
+\label{sec:metrik}
+
+Kinerja sistem dinilai menggunakan beberapa metrik yang mewakili aspek keamanan, efisiensi, dan kualitas pergerakan robot. Seluruh metrik direkam secara otomatis menggunakan \texttt{experiment\_logger.py} selama eksperimen berlangsung.
+
+\subsubsection*{a. Tingkat Keberhasilan Navigasi (\textit{Success Rate})}
+
+Sebuah \textit{trial} dinyatakan berhasil apabila robot mencapai tujuan dalam batas waktu pengujian dan tidak mengalami tabrakan selama perjalanan.
+
+\begin{equation}
+success=
+\begin{cases}
+1, & \text{jika } goal\_reached = 1 \\
+   & \text{dan } collision\_count = 0 \\
+   & \text{dan } t \leq 120\ \text{s} \\
+0, & \text{lainnya}
+\end{cases}
+\label{eq:success}
+\end{equation}
+
+Tingkat keberhasilan dihitung menggunakan:
+
+\begin{equation}
+SR=
+\frac{\sum success}{n}\times100\%
+\label{eq:success_rate}
+\end{equation}
+
+dengan $n$ adalah jumlah \textit{trial} pada setiap skenario.
+
+Selain itu, keamanan navigasi juga dievaluasi menggunakan \textit{Collision-Free Rate} (CFR), yaitu persentase percobaan yang tidak mengalami tabrakan selama proses navigasi berlangsung.
+
+\begin{equation}
+CFR=
+\frac{\sum collision\_free}{n}\times100\%
+\label{eq:cfr}
+\end{equation}
+
+Nilai CFR yang tinggi menunjukkan kemampuan sistem dalam mempertahankan navigasi bebas tabrakan.
+
+\subsubsection*{b. Minimum Clearance}
+
+\textit{Clearance} merepresentasikan jarak bebas antara robot dan obstacle selama navigasi. Untuk setiap obstacle yang diamati, nilai clearance dihitung sebagai:
+
+\begin{equation}
+c_{i,k}
+=
+d_{i,k}
+-
+r_{robot}
+-
+r_{obs,k}
+\label{eq:clearance}
+\end{equation}
+
+dengan:
+
+\begin{itemize}
+\item $d_{i,k}$ adalah jarak pusat robot terhadap obstacle ke-$k$,
+\item $r_{robot}$ adalah radius robot,
+\item $r_{obs,k}$ adalah radius obstacle ke-$k$.
+\end{itemize}
+
+Nilai minimum clearance selama satu \textit{trial} dihitung sebagai:
+
+\begin{equation}
+c_{min}
+=
+\min(c_{i,k})
+\label{eq:min_clearance}
+\end{equation}
+
+Minimum clearance dipilih sebagai metrik utama karena secara langsung merepresentasikan margin keselamatan yang dipertahankan robot terhadap obstacle selama proses navigasi berlangsung. Berbeda dengan \textit{success rate} yang hanya menunjukkan hasil akhir navigasi, minimum clearance mampu menggambarkan tingkat risiko kolisi yang dialami robot sepanjang lintasan yang ditempuh. Metrik ini menjadi sangat relevan karena tujuan utama integrasi kamera termal dan pengendali fuzzy adalah meningkatkan kemampuan robot dalam mempertahankan jarak aman terhadap obstacle, khususnya obstacle berprofil rendah yang berada pada area \textit{blind-spot} LiDAR.
+
+\subsubsection*{c. Waktu Navigasi}
+
+Waktu navigasi menunjukkan durasi yang dibutuhkan robot untuk mencapai tujuan.
+
+\begin{equation}
+t_{nav}
+=
+t_{finish}
+-
+t_{start}
+\label{eq:nav_time}
+\end{equation}
+
+Metrik ini digunakan untuk mengevaluasi efisiensi temporal sistem navigasi.
+
+\subsubsection*{d. Panjang Lintasan}
+
+Panjang lintasan dihitung dari trajektori robot yang diperoleh melalui data odometri.
+
+\begin{equation}
+L
+=
+\sum_{i=1}^{N}
+\sqrt{
+(x_i-x_{i-1})^2
++
+(y_i-y_{i-1})^2
+}
+\label{eq:path_length}
+\end{equation}
+
+Nilai yang lebih kecil menunjukkan jalur yang lebih efisien.
+
+\subsubsection*{e. Kecepatan Rata-Rata}
+
+Kecepatan linear rata-rata dihitung menggunakan:
+
+\begin{equation}
+\bar{v}
+=
+\frac{1}{N}
+\sum_{i=1}^{N}
+|v_i|
+\label{eq:avg_linear}
+\end{equation}
+
+sedangkan kecepatan angular rata-rata dihitung menggunakan:
+
+\begin{equation}
+\bar{\omega}
+=
+\frac{1}{N}
+\sum_{i=1}^{N}
+|\omega_i|
+\label{eq:avg_angular}
+\end{equation}
+
+Nilai $\bar{\omega}$ digunakan sebagai indikator kehalusan pergerakan robot selama navigasi.
+
+\begin{table}[H]
+\centering
+\caption{Ringkasan metrik evaluasi}
+\label{tab:metrik}
+\begin{tabular}{llll}
+\toprule
+\textbf{Metrik} &
+\textbf{Simbol} &
+\textbf{Satuan} &
+\textbf{Dimensi} \\
+\midrule
+Success Rate & $SR$ & \% & Efisiensi \\
+Collision-Free Rate & $CFR$ & \% & Keamanan \\
+Minimum Clearance & $c_{min}$ & m & Keamanan \\
+Waktu Navigasi & $t_{nav}$ & s & Efisiensi \\
+Panjang Lintasan & $L$ & m & Efisiensi \\
+Kecepatan Linear Rata-rata & $\bar{v}$ & m/s & Kualitas \\
+Kecepatan Angular Rata-rata & $\bar{\omega}$ & rad/s & Kehalusan \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Hubungan metrik evaluasi dan tujuan analisis}
+\label{tab:metric_mapping}
+\begin{tabular}{lll}
+\toprule
+\textbf{Tujuan Evaluasi} &
+\textbf{Metrik} &
+\textbf{Bab IV} \\
+\midrule
+Keselamatan Navigasi &
+Minimum Clearance &
+4.4 \\
+Keberhasilan Navigasi &
+Success Rate, CFR &
+4.3 \\
+Efisiensi Navigasi &
+Navigation Time, Path Length &
+4.5 \\
+Kehalusan Gerak &
+Average Angular Velocity &
+4.6 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Akuisisi dan Logging Data}
+
+Pencatatan data dilakukan secara otomatis menggunakan node \texttt{experiment\_logger.py}. Node ini berjalan selama eksperimen berlangsung dan merekam seluruh data yang diperlukan untuk proses evaluasi.
+
+Topik yang digunakan selama proses logging meliputi:
+
+\begin{itemize}
+\item \texttt{/odom},
+\item \texttt{/cmd\_vel},
+\item \texttt{/gazebo/model\_states},
+\item \texttt{/move\_base/result},
+\item \texttt{/move\_base/recovery\_status},
+\item \texttt{/traversability\_score},
+\item \texttt{/corridor\_width}.
+\end{itemize}
+
+Pada akhir setiap \textit{trial}, seluruh metrik disimpan ke berkas CSV pada direktori \texttt{experime\-nt\_data}. Selain ringkasan metrik, trajektori robot juga disimpan untuk keperluan visualisasi dan analisis lebih lanjut pada Bab~IV.
+
+\subsection{Analisis Statistik}
+
+\subsubsection*{a. Pemilihan Uji Statistik}
+
+Setiap skenario dieksekusi sebanyak sepuluh kali percobaan independen. Dengan ukuran sampel yang relatif kecil ($n = 10$ per kelompok), asumsi distribusi normal tidak dapat dijamin. Oleh karena itu, penelitian ini menggunakan uji non-parametrik Mann--Whitney U yang tidak mensyaratkan distribusi normal dan banyak digunakan pada evaluasi sistem robotika berbasis simulasi (\cite{Adiuku2024}).
+
+\subsubsection*{b. Uji Mann--Whitney U}
+
+Analisis dilakukan secara berpasangan pada S1--S5, S2--S6, S3--S7, dan S4--S8.
+
+Hipotesis statistik yang digunakan adalah:
+
+\begin{itemize}
+\item $H_0$: distribusi kedua kelompok identik.
+\item $H_1$: terdapat perbedaan distribusi antara kedua kelompok.
+\end{itemize}
+
+Tingkat signifikansi yang digunakan adalah:
+
+\begin{equation}
+\alpha = 0.05
+\end{equation}
+
+\subsubsection*{c. Effect Size}
+
+Selain signifikansi statistik, penelitian ini menghitung \textit{effect size} menggunakan \textit{rank-bise\-rial correlation} (\cite{Kerby2014}):
+
+\begin{equation}
+r
+=
+1 - \frac{2U}{n_1 n_2}
+\label{eq:rank_biserial}
+\end{equation}
+
+dengan $U$ adalah statistik Mann--Whitney dan $n_1$ serta $n_2$ adalah ukuran sampel masing-masing kelompok.
+
+Interpretasi nilai \textit{rank-biserial correlation} mengacu pada pedoman umum yang mengelompokkan nilai absolut koefisien menjadi efek kecil ($|r| < 0{,}30$), efek sedang ($0{,}30 \leq |r| < 0{,}50$), dan efek besar ($|r| \geq 0{,}50$). Nilai positif menunjukkan bahwa kelompok fuzzy cenderung menghasilkan nilai metrik yang lebih tinggi dibandingkan kelompok \textit{baseline}, sedangkan nilai negatif menunjukkan kecenderungan sebaliknya.
+
+\subsection{Interpretasi Hasil}
+
+Analisis hasil pada Bab~IV difokuskan pada empat aspek utama, yaitu:
+
+\begin{enumerate}
+\item peningkatan keamanan navigasi melalui \textit{minimum clearance};
+\item kemampuan menghindari obstacle pada area \textit{blind-spot} LiDAR;
+\item efisiensi navigasi berdasarkan waktu tempuh dan panjang lintasan;
+\item kualitas pergerakan berdasarkan karakteristik kecepatan robot.
+\end{enumerate}
+
+Hasil pengujian disajikan dalam bentuk tabel statistik, grafik distribusi data, visualisasi trajektori, serta analisis perbandingan antara konfigurasi \textit{baseline} dan fuzzy pada setiap skenario pengujian.

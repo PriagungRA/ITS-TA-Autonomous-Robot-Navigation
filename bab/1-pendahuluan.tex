@@ -1,0 +1,77 @@
+\chapter{PENDAHULUAN}
+\label{chap:pendahuluan}
+
+\section{Latar Belakang}
+\label{sec:latarbelakang}
+
+Perkembangan robot bergerak otonom (\textit{autonomous mobile robot}) dalam beberapa tahun terakhir menunjukkan peningkatan yang signifikan seiring dengan kebutuhan otomatisasi pada sektor industri, logistik, kesehatan, dan layanan publik. Kemampuan robot untuk bergerak secara mandiri di lingkungan kerja bergantung pada sistem navigasi yang mampu memahami kondisi lingkungan, merencanakan lintasan, serta menghindari obstacle secara aman selama perjalanan. Oleh karena itu, sistem persepsi lingkungan menjadi salah satu komponen utama yang menentukan tingkat keselamatan dan keandalan navigasi robot (\cite{Liu2024,Macenski2022}).
+
+Pada lingkungan indoor, sensor LiDAR dua dimensi (LiDAR 2D) merupakan salah satu sensor yang paling banyak digunakan karena mampu memberikan informasi jarak dengan ting\-kat akurasi yang tinggi serta memiliki kebutuhan komputasi yang relatif rendah. Data hasil pemindaian LiDAR juga telah terintegrasi secara luas pada berbagai sistem navigasi berbasis Robot Operating System (ROS) untuk kebutuhan pemetaan, lokalisasi, dan penghindaran obstacle (\cite{Macenski2022}). Meskipun demikian, LiDAR 2D hanya melakukan pemindaian pada satu bidang horizontal sehingga informasi yang diperoleh terbatas pada objek yang berpotongan langsung dengan bidang pemindaian tersebut (\cite{Fagundes2024}).
+
+Keterbatasan tersebut menimbulkan permasalahan yang dikenal sebagai \textit{blind-spot} vertikal. Obstacle yang memiliki tinggi lebih rendah atau berada di luar bidang pemindaian LiDAR berpotensi tidak terdeteksi meskipun secara fisik berada pada jalur pergerakan robot. Kondisi ini dapat menyebabkan robot bergerak sangat dekat dengan obstacle atau bahkan mengalami tabrakan. Permasalahan menjadi semakin penting pada lingkungan indoor yang sering mengandung obstacle berprofil rendah, seperti hewan peliharaan, barang yang terletak di lantai, maupun objek lain yang tidak sepenuhnya teramati oleh sensor laser (\cite{Kibii2022,Fagundes2024}).
+
+Salah satu pendekatan yang dapat digunakan untuk mengatasi keterbatasan tersebut adalah memanfaatkan sensor dengan karakteristik pengamatan yang berbeda sebagai sumber informasi tambahan. Kamera termal merupakan salah satu sensor yang berpotensi digunakan karena mampu merekam distribusi temperatur objek dan lingkungan tanpa bergantung pada karakteristik visual yang diamati kamera RGB konvensional (\cite{Castro2016}). Informasi termal dapat digunakan untuk mengenali keberadaan obstacle yang tidak terdeteksi secara memadai oleh LiDAR, terutama pada objek yang memiliki kontras temperatur terhadap lingkungan sekitarnya. Beberapa penelitian menunjukkan bahwa integrasi kamera termal dan LiDAR mampu meningkatkan kualitas persepsi lingkungan pada sistem robotika dan kendaraan otonom karena kedua sensor memiliki karakteristik yang saling melengkapi (\cite{Choi2023,Schichler2025}).
+
+Meskipun demikian, peningkatan kualitas persepsi lingkungan belum tentu secara langsung menghasilkan navigasi yang lebih aman. Informasi sensor yang lebih lengkap tetap mem\-erlukan mekanisme pengambilan keputusan yang mampu menyesuaikan perilaku navigasi terhadap kondisi lingkungan yang berubah-ubah. Salah satu metode navigasi reaktif yang banyak digunakan pada robot bergerak adalah \textit{Artificial Potential Field} (APF) karena memiliki formulasi yang sederhana dan mampu menghasilkan respons penghindaran obstacle secara real-time (\cite{Khatib1986}). Akan tetapi, APF konvensional umumnya menggunakan parameter yang bersifat tetap sehingga respons navigasi yang dihasilkan kurang adaptif terhadap perubahan tingkat risiko lingkungan (\cite{Lv2024}).
+
+Untuk meningkatkan kemampuan adaptasi tersebut, beberapa penelitian mengombinasikan metode navigasi dengan logika fuzzy sebagai mekanisme pengambilan keputusan. Logika fuzzy memungkinkan sistem menghasilkan keputusan yang lebih fleksibel berdasarkan kondisi lingkungan yang diamati sensor tanpa memerlukan model matematis yang kompleks. Pendekatan ini telah dilaporkan mampu meningkatkan keamanan dan kelancaran navigasi robot pada lingkungan yang dinamis maupun tidak terstruktur (\cite{Haider2022,Benaicha2026}).
+
+Berdasarkan permasalahan tersebut, penelitian ini mengusulkan sistem navigasi robot ber\-oda otonom berbasis logika fuzzy dengan fusi sensor LiDAR dan kamera termal. Kamera termal digunakan untuk melengkapi keterbatasan persepsi LiDAR melalui pembentukan informasi traversability termal dan \textit{virtual LaserScan} pada area yang tidak teramati oleh sensor laser. Informasi tersebut kemudian digabungkan dengan traversability berbasis LiDAR untuk menghasilkan traversability efektif yang digunakan dalam proses navigasi. Selanjutnya, logika fuzzy Mamdani diterapkan untuk mengatur parameter \textit{speed scale} dan \textit{repulsive gain} pada \textit{Artificial Potential Field} secara adaptif berdasarkan kondisi lingkungan yang diamati.
+
+Pengujian dilakukan pada lingkungan simulasi ROS Noetic dan Gazebo menggunakan berbagai skenario yang mencakup kondisi tanpa obstacle, obstacle manusia statis, obstacle berprofil rendah pada area \textit{blind-spot} LiDAR, serta obstacle dinamis. Melalui pendekatan tersebut, penelitian ini diharapkan dapat meningkatkan keselamatan navigasi robot bergerak dengan mempertahankan margin jarak aman yang lebih besar terhadap obstacle tanpa mengubah struktur dasar sistem navigasi ROS yang digunakan.
+
+\section{Rumusan Masalah}
+\label{sec:Rumusan Masalah}
+
+Berdasarkan latar belakang yang telah diuraikan, permasalahan yang dibahas dalam penelitian ini dapat dirumuskan sebagai berikut.
+
+\begin{enumerate}
+\item Bagaimana merancang sistem navigasi robot beroda otonom yang mampu mengintegrasikan informasi dari sensor LiDAR 2D dan kamera termal untuk mengatasi keterbatasan deteksi obstacle pada area \textit{blind-spot} LiDAR?
+\item Bagaimana membentuk dan menggabungkan informasi traversability yang diperoleh dari sensor LiDAR dan kamera termal sehingga dapat digunakan sebagai representasi kondisi lingkungan untuk mendukung proses navigasi robot?
+\item Bagaimana menerapkan logika fuzzy Mamdani untuk mengatur parameter navigasi secara adaptif berdasarkan jarak obstacle dan nilai traversability lingkungan pada metode \textit{Artificial Potential Field}?
+\item Sejauh mana integrasi kamera termal dan pengendali fuzzy mampu meningkatkan performa navigasi robot, khususnya pada aspek keselamatan, kemampuan menghindari obstacle berprofil rendah, serta efisiensi pergerakan dibandingkan konfigurasi navigasi tanpa pengendali fuzzy?
+\end{enumerate}
+
+
+\section{Batasan Masalah}
+\label{sec:batasanmasalah}
+
+Agar penelitian memiliki ruang lingkup yang jelas dan terfokus, beberapa batasan masalah yang digunakan dalam penelitian ini adalah sebagai berikut.
+
+\begin{enumerate}
+\item Penelitian difokuskan pada sistem navigasi robot beroda otonom yang beroperasi pada lingkungan indoor.
+\item Sensor yang digunakan terdiri atas LiDAR dua dimensi (LiDAR 2D) dan kamera termal. Sensor lain seperti kamera RGB, LiDAR tiga dimensi, radar, maupun sensor kedalaman tidak digunakan dalam penelitian ini.
+\item Data kamera termal digunakan untuk membentuk informasi traversability termal dan \textit{virtual LaserScan} sebagai pelengkap informasi yang diperoleh dari LiDAR 2D.
+\item Fusi sensor dilakukan pada tingkat representasi traversability sehingga penelitian tidak membahas fusi data mentah (\textit{raw data fusion}) maupun fusi berbasis deteksi objek.
+\item Metode navigasi lokal yang digunakan adalah \textit{Artificial Potential Field} (APF) yang diimplementasikan sebagai \textit{local planner} pada ROS Navigation Stack.
+\item Pengendali yang digunakan untuk mengatur parameter navigasi adalah logika fuzzy Ma\-mdani dengan variabel masukan berupa jarak obstacle terdekat dan nilai traversability efektif hasil fusi sensor.
+\item Parameter navigasi yang diadaptasikan oleh sistem fuzzy dibatasi pada \textit{speed scale} dan \textit{repulsive gain} dari APF.
+\item Pengujian dilakukan pada lingkungan simulasi menggunakan ROS Noetic dan Gazebo sehingga penelitian tidak membahas implementasi pada robot fisik maupun pengaruh kondisi sensor nyata terhadap performa sistem.
+\item Evaluasi difokuskan pada aspek keselamatan dan performa navigasi yang meliputi \textit{Success Rate}, \textit{Collision-Free Rate}, \textit{minimum clearance}, waktu tempuh, panjang lintasan, serta karakteristik pergerakan robot.
+\item Penelitian tidak membahas proses pemetaan (\textit{mapping}), pengembangan algoritma lokal\-isasi, maupun optimasi perencanaan jalur global karena posisi robot diperoleh melalui mekanisme \textit{fake\_localization}.
+\end{enumerate}
+
+
+\section{Tujuan}
+\label{sec:Tujuan}
+
+Penelitian ini bertujuan untuk mengembangkan dan mengevaluasi sistem navigasi robot beroda otonom berbasis logika fuzzy dengan fusi sensor LiDAR dan kamera termal untuk meningkatkan keselamatan navigasi pada lingkungan indoor. Secara khusus, tujuan yang ingin dicapai dalam penelitian ini adalah sebagai berikut.
+
+\begin{enumerate}
+\item Merancang sistem navigasi robot beroda otonom yang mengintegrasikan sensor LiDAR 2D dan kamera termal untuk mengatasi keterbatasan deteksi obstacle pada area \textit{blind-spot} LiDAR.
+\item Mengembangkan metode pembentukan dan fusi informasi traversability berbasis LiDAR dan kamera termal sebagai representasi kondisi lingkungan yang digunakan dalam proses navigasi robot.
+\item Menerapkan logika fuzzy Mamdani untuk mengatur parameter \textit{speed scale} dan \textit{repulsive gain} pada metode \textit{Artificial Potential Field} secara adaptif berdasarkan kondisi lingkungan yang diamati sensor.
+\item Mengevaluasi pengaruh integrasi kamera termal dan pengendali fuzzy terhadap performa navigasi robot berdasarkan aspek keselamatan, kemampuan menghindari obstacle berprofil rendah, efisiensi navigasi, dan kualitas pergerakan robot.
+\end{enumerate}
+
+\section{Manfaat}
+\label{sec:Manfaat}
+
+Penelitian ini diharapkan dapat memberikan manfaat sebagai berikut.
+
+\begin{enumerate}
+\item Menghasilkan sistem navigasi robot beroda otonom yang mampu meningkatkan kemampuan deteksi obstacle pada area \textit{blind-spot} LiDAR melalui integrasi sensor LiDAR 2D dan kamera termal.
+\item Menyediakan pendekatan fusi traversability berbasis LiDAR dan kamera termal yang dapat digunakan sebagai representasi kondisi lingkungan untuk mendukung proses navigasi robot secara lebih aman.
+\item Meningkatkan kemampuan adaptasi sistem navigasi melalui penerapan logika fuzzy Ma\-mdani dalam pengaturan parameter \textit{Artificial Potential Field} berdasarkan kondisi lingkungan yang diamati sensor.
+\item Menjadi referensi bagi penelitian selanjutnya yang berkaitan dengan fusi sensor, estimasi traversability, logika fuzzy, dan navigasi robot bergerak otonom pada lingkungan indoor.
+\end{enumerate}

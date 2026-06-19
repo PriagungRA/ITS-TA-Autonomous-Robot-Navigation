@@ -1,0 +1,112 @@
+Subbab ini menjelaskan bagaimana informasi termal dari \texttt{thermal\_obstacle\_mask} diproyeksikan menjadi \textit{virtual scan} berformat \texttt{sensor\_msgs/LaserScan} yang dapat dibaca langsung oleh \textit{costmap} dan APFPlanner, seolah-olah terdapat sensor jarak tambahan yang mengamati area \textit{blind-spot}~\cite{Liu2024}. Sebelumnya telah dijelaskan bahwa LiDAR 2D secara struktural tidak mampu mendeteksi \textit{obstacle} yang seluruh profilnya berada di bawah bidang pindai, sedangkan kamera termal dapat mengidentifikasi objek tersebut melalui emisi panasnya.
+
+\subsection{Proyeksi Blob Termal ke \textit{Virtual LaserScan}}
+\label{sec:proyeksi_scan}
+
+\textit{Node} \texttt{thermal\_blindspot\_to\_scan.py} menerima topik \texttt{/thermal\_obstacle\_mask} (citra biner 8-bit, resolusi $640 \times 480$ piksel, frekuensi 10~Hz) dan menghasilkan topik \texttt{/thermal\_blindspot\_scan} berformat \texttt{sensor\_msgs/LaserScan} dalam \textit{frame} \texttt{base\_link}. \textit{Virtual scan} ini terdiri atas 61 \textit{beam} yang merentang dari sudut $-0{,}70$~rad hingga $+0{,}70$~rad ($\approx \pm40^\circ$) terhadap sumbu depan robot.
+
+\subsubsection*{a. Pra-pemrosesan Masker}
+
+Sebelum proyeksi, masker biner diproses melalui dua tahap morfologi tambahan, yaitu \textit{morphological opening} dengan kernel $3 \times 3$ untuk membuang noise kecil, diikuti \textit{morphological closing} dengan kernel $5 \times 5$ untuk menutup celah kecil pada blob. Hanya piksel dengan nilai di atas ambang \texttt{pixel\_thresh = 100} yang dipertahankan. Langkah ini memastikan bahwa hanya area panas yang kohesif dan signifikan secara spasial yang diproyeksikan sebagai \textit{virtual obstacle}.
+
+\subsubsection*{b. Pembatasan ROI Bagian Bawah}
+
+Setelah proses morfologi, diterapkan pembatasan area yang hanya memproses piksel di bagian bawah citra ($y \geq h \times \texttt{roi\_top\_frac}$, dengan \texttt{roi\_top\_frac = 0,45}), sehingga hanya 55\% bagian bawah citra yang dipertimbangkan. Pembatasan ini secara efektif mengabaikan area jauh yang muncul di bagian atas pandangan kamera, seperti tembok jauh atau struktur tinggi, dan hanya berfokus pada area lantai dekat yang relevan bagi \textit{blind-spot} robot~\cite{Kibii2022}.
+
+\subsubsection*{c. Gating dan Seleksi Blob}
+
+\textit{Node} ini menggunakan \texttt{cv2.connectedComponentsWithStats} untuk mengidentifikasi blob yang terpisah dalam masker. Setiap blob dievaluasi dengan dua kriteria:
+\begin{enumerate}
+    \item Luas blob minimal \texttt{min\_blob\_px = 40} piksel, untuk membuang noise piksel panas yang bukan objek nyata.
+    \item Posisi sentroid blob $c_y \geq h \times \texttt{min\_centroid\_frac}$ (dengan \texttt{min\_centroid\_frac = 0,60}), artinya titik tengah blob harus berada pada 40\% bagian bawah citra. Blob yang sentroidnya masih berada di area atas (jauh) ditolak meskipun sebagian pikselnya masuk ke ROI bawah.
+\end{enumerate}
+Syarat ini mencegah struktur panas yang jauh, seperti pantulan cahaya langit-langit, diperlakukan sebagai \textit{false positive obstacle}.
+
+\subsubsection*{d. Proyeksi Piksel ke Jarak dan Sudut}
+
+Untuk setiap piksel $(p_x, p_y)$ dari blob yang lolos seleksi, dilakukan proyeksi ke koordinat polar robot menggunakan dua persamaan berikut.
+
+\textit{Pertama}, posisi vertikal piksel $p_y$ dalam area ROI bawah dipetakan ke estimasi jarak radial:
+\begin{equation}
+    r = r_\text{far} + (r_\text{near} - r_\text{far}) \cdot v, \quad
+    v = \frac{p_y - y_\text{top}}{h - y_\text{top}}
+    \label{eq:range_projection}
+\end{equation}
+dengan $y_\text{top} = h \times \texttt{roi\_top\_frac}$ sebagai batas atas ROI, $r_\text{near} = 0{,}25$~m sebagai jarak yang diasosiasikan dengan piksel di bagian paling bawah citra (objek sangat dekat), dan $r_\text{far} = 0{,}85$~m sebagai jarak yang diasosiasikan dengan batas atas ROI (objek relatif jauh). Nilai $v \in [0, 1]$ adalah posisi vertikal ternormalisasi dalam ROI, dengan $v=0$ berarti batas atas ROI dan $v=1$ berarti baris terbawah citra. Intuisinya, piksel di baris bawah (dekat tepi bawah kamera) merepresentasikan objek yang lebih dekat ke robot dibandingkan piksel di baris atas ROI.
+
+\textit{Kedua}, posisi horizontal piksel $p_x$ dipetakan ke sudut \textit{beam}:
+\begin{equation}
+    u = \frac{p_x - w/2}{w/2}, \quad
+    \theta = -u \cdot \alpha_\text{fov}
+    \label{eq:angle_projection}
+\end{equation}
+dengan $w$ sebagai lebar citra (640 piksel), $u \in [-1, +1]$ sebagai posisi horizontal ternormalisasi, dan $\alpha_\text{fov} = 0{,}70$~rad sebagai setengah lebar FOV lateral. Tanda negatif pada $\theta$ muncul karena sumbu-$x$ citra (positif ke kanan) berlawanan dengan konvensi sudut robot (positif ke kiri dalam \textit{frame} \texttt{base\_link}). \textit{Beam} kemudian dipilih sebagai:
+\begin{equation}
+    b = \mathrm{round}\!\left(\frac{\theta - \alpha_\text{min}}{\Delta\alpha}\right),
+    \quad \Delta\alpha = \frac{\alpha_\text{max} - \alpha_\text{min}}{N_b - 1}
+    \label{eq:beam_index}
+\end{equation}
+dengan $\alpha_\text{min} = -0{,}70$~rad, $\alpha_\text{max} = +0{,}70$~rad, dan $N_b = 61$ \textit{beam}. Jika \textit{beam} $b$ valid ($0 \leq b < 61$) dan estimasi jarak $r$ lebih kecil daripada nilai sebelumnya pada \textit{beam} tersebut, nilai $r$ diperbarui (\textit{minimum-range assignment}).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{gambar/3.5_proyeksi_blindspot.png}
+    \caption{Ilustrasi proyeksi piksel blob termal ke koordinat polar robot. Baris piksel bawah (dekat tepi bawah citra, $v \approx 1$) dipetakan ke jarak pendek ($r \approx r_\text{near} = 0{,}25$~m), sedangkan baris atas ROI ($v \approx 0$) dipetakan ke jarak lebih jauh ($r \approx r_\text{far} = 0{,}85$~m). Posisi horizontal piksel dipetakan ke sudut \textit{beam}: piksel di kanan citra ($u > 0$) menjadi \textit{beam} ke kanan robot ($\theta < 0$), sesuai konvensi \textit{frame} \texttt{base\_link}.}
+    \label{fig:proyeksi_blindspot}
+\end{figure}
+
+\subsubsection*{e. Publikasi \textit{Virtual Scan} dan Mekanisme Memori}
+
+Setelah seluruh piksel blob diproyeksikan, \textit{virtual scan} diterbitkan. \textit{Beam} yang tidak terkena blob menerima nilai $r = \infty$. Nilai $\infty$ pada \textit{LaserScan} memberikan sinyal kepada lapisan \textit{obstacle} \textit{costmap} untuk melakukan \textit{ray-tracing clearing}: jalur \textit{beam} tersebut dibersihkan dari penanda \textit{obstacle} yang tersisa, sehingga mencegah terbentuknya "\textit{obstacle} hantu" yang tidak hilang saat kucing bergerak pergi~\cite{Fagundes2024}.
+
+Untuk mengatasi kedipan (\textit{flickering}) deteksi termal yang terjadi saat kamera bergerak atau piksel panas tidak stabil, sistem menerapkan mekanisme \textit{temporal memory}: jika pada satu siklus tidak ada blob yang terdeteksi (\textit{n\_hit = 0}), sistem mempertahankan hasil \textit{scan} terakhir selama $\tau_\text{mem} = 0{,}7$~detik sebelum benar-benar mengosongkan \textit{scan}. Hal ini mencegah \textit{costmap} menghapus posisi \textit{obstacle} secara prematur sebelum robot sempat bereaksi.
+
+\subsection{Fusi Traversability LiDAR--Termal}
+\label{sec:fusi_trav}
+
+Selain diproyeksikan sebagai \textit{virtual scan}, informasi termal juga digunakan untuk memodulasi nilai \textit{traversability} yang menjadi masukan \textit{fuzzy controller}. Proses fusi ini terjadi di dalam \texttt{APFPlanner} melalui fungsi \texttt{computeTraversability()}, yang dipanggil setiap siklus kontrol pada konfigurasi fuzzy (S5--S8).
+
+\subsubsection*{a. Traversability dari LiDAR}
+
+Komponen pertama adalah \textit{traversability} berbasis geometri dari data LiDAR. Fungsi ini mengukur lebar koridor lateral dalam jendela sudut $[\varphi_\text{lo}, \varphi_\text{hi}]$ (sekitar $55^\circ$ hingga $125^\circ$ dari sumbu depan, yaitu arah menyamping) menggunakan persamaan:
+\begin{equation}
+    d_\text{lat} = r_i \cdot \sin|\varphi_i|, \quad
+    \varphi_i \in [\varphi_\text{lo}, \varphi_\text{hi}]
+    \label{eq:lateral_dist}
+\end{equation}
+dengan $r_i$ sebagai jarak LiDAR pada sudut $\varphi_i$, dan $d_\text{lat}$ sebagai komponen lateral murni (jarak tegak lurus ke dinding). Lebar koridor dihitung sebagai jumlah jarak lateral minimum kiri dan kanan:
+\begin{equation}
+    w_\text{corridor} = d_\text{lat,kiri} + d_\text{lat,kanan}
+    \label{eq:corridor_lidar}
+\end{equation}
+Nilai ini kemudian dinormalisasi menjadi skor \textit{traversability} LiDAR:
+\begin{equation}
+    \tau_\text{LiDAR} = \mathrm{clip}\!\left(\frac{w_\text{corridor} - w_\text{robot}}{w_\text{ref}},\; 0, 1\right)
+    \label{eq:trav_lidar_blindspot}
+\end{equation}
+dengan $w_\text{robot}$ sebagai lebar robot (diambil dari parameter \texttt{robot\_width\_}) dan $w_\text{ref}$ sebagai lebar referensi koridor penuh.
+
+\subsubsection*{b. Fusi dengan \textit{Low-Pass Filter} Asimetris}
+
+Skor \textit{traversability} termal $\tau_\text{thermal}$ dari topik \texttt{/traversability\_score} difusikan dengan komponen LiDAR menggunakan \textit{low-pass filter} (LPF) asimetris pada $\tau_\text{thermal}$:
+\begin{equation}
+    \alpha = \begin{cases}
+        0{,}50 & \text{jika } \tau_\text{thermal} < \hat{\tau}_\text{thermal} \quad \text{(turun cepat)}\\
+        0{,}20 & \text{jika } \tau_\text{thermal} \geq \hat{\tau}_\text{thermal} \quad \text{(naik lambat)}
+    \end{cases}
+    \label{eq:lpf_alpha}
+\end{equation}
+\begin{equation}
+    \hat{\tau}_\text{thermal} \leftarrow (1 - \alpha)\,\hat{\tau}_\text{thermal} + \alpha\,\tau_\text{thermal}
+    \label{eq:lpf_update}
+\end{equation}
+dengan $\hat{\tau}_\text{thermal}$ sebagai nilai terfilter (\textit{state} LPF). Asimetri ini disengaja: saat \textit{obstacle} panas muncul di FOV kamera ($\tau_\text{thermal}$ turun), filter merespons cepat ($\alpha = 0{,}50$) demi keamanan; saat \textit{obstacle} pergi ($\tau_\text{thermal}$ naik kembali), filter merespons lambat ($\alpha = 0{,}20$) untuk menghindari reaksi prematur akibat kedipan deteksi.
+
+Nilai \textit{traversability} efektif yang digunakan sebagai masukan fuzzy diambil sebagai nilai minimum antara kedua komponen:
+\begin{equation}
+    \tau_\text{eff} = \min\!\left(\tau_\text{LiDAR},\; \hat{\tau}_\text{thermal}\right)
+    \label{eq:trav_eff}
+\end{equation}
+Penggunaan operator \textit{minimum} memastikan sistem selalu mengambil kondisi yang paling konservatif: jika LiDAR mendeteksi koridor sempit atau kamera termal mendeteksi \textit{obstacle} panas di depan, nilai $\tau_\text{eff}$ akan turun dan memicu respons yang lebih hati-hati dari \textit{fuzzy controller}~\cite{Schichler2025}. Prinsip ini konsisten dengan desain sistem fusi sensor yang memprioritaskan keamanan (\textit{safety-first fusion})~\cite{Haider2022}.
+
+Nilai $\tau_\text{eff}$ beserta $d_\text{min,obs}$ (jarak ke \textit{obstacle} terdekat dari LiDAR) kemudian menjadi dua masukan ke fungsi \texttt{fuzzy::fuzzyCompute()}, yang akan dibahas pada Subbab~\ref{sec:algoritma_navigasi}.
