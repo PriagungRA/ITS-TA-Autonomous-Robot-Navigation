@@ -45,6 +45,7 @@
 \usepackage{colortbl}
 \usepackage{amssymb}
 \usepackage{booktabs}
+\usepackage{diagbox}
 \usepackage{pdfpages}
 
 
@@ -137,6 +138,9 @@
 }
 \lstset{style=codestyle}
 
+% Pengaturan format subsubsection untuk menampilkan huruf kapital
+\renewcommand{\thesubsubsection}{\Alph{subsubsection}.}
+
 % Isi keseluruhan dokumen
 \begin{document}
 
@@ -226,8 +230,8 @@
 \input{bab/2-tinjauan-pustaka.tex}
 \cleardoublepage
 
-% Bab 3 desain dan implementasi
-\input{bab/3-desain-implementasi.tex}
+% Bab 3 metodologi
+\input{bab/3-metodologi.tex}
 \cleardoublepage
 
 % Bab 4 pengujian dan analisis
@@ -254,6 +258,8 @@
 
 \chapter*{LAMPIRAN}
 \addcontentsline{toc}{chapter}{LAMPIRAN}
+
+\appendix
 
 \input{bab/lampiran.tex}
 \cleardoublepage

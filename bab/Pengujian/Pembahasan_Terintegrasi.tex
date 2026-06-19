@@ -1,0 +1,233 @@
+Subbab~\ref{sec:statistik_terintegrasi} telah menyatukan hasil uji statistik
+dari seluruh metrik kontinu ke dalam satu pandangan menyeluruh. Pola yang
+muncul di sana, peningkatan keselamatan yang konsisten, \textit{trade-off}
+efisiensi yang terukur, dan perubahan kualitas gerak yang tidak seragam,
+perlu dipahami bukan hanya sebagai angka, tetapi sebagai konsekuensi dari
+rancangan metode yang telah diuraikan pada BAB III. Subbab ini membahas
+mengapa pola-pola tersebut muncul dan apa maknanya terhadap tujuan
+penelitian: apakah integrasi \textit{virtual blind-spot scan}, fusi
+\textit{traversability} LiDAR--termal, dan adaptasi fuzzy Mamdani benar-benar
+memberikan manfaat terhadap keselamatan navigasi tanpa mengorbankan performa
+secara berlebihan.
+
+\subsection{Menjawab Pertanyaan Penelitian}
+
+\textbf{Apakah metode usulan mempertahankan keberhasilan navigasi?}
+Berdasarkan Subbab~\ref{sec:keberhasilan_tabrakan}, metode usulan mencapai
+\textit{success rate} dan \textit{collision-free rate} 100\% pada seluruh
+empat skenario fuzzy (S5--S8). Metode \textit{baseline} juga mencapai 100\%
+pada tiga dari empat skenarionya (S1--S3), dengan satu pengecualian pada S4
+(90\%, satu dari sepuluh \textit{trial} mengalami tabrakan dengan
+\texttt{obstacle\_human\_1} meski robot tetap mencapai \textit{goal}). Data
+ini tidak mendukung narasi bahwa \textit{baseline} "gagal", baseline tetap
+berhasil pada sembilan dari sepuluh kombinasi skenario-konfigurasi, namun
+metode usulan berhasil menutup satu-satunya celah kegagalan yang muncul pada
+kondisi paling menantang, yaitu kombinasi \textit{obstacle} dinamis dan
+\textit{blind-spot}.
+
+\textbf{Apakah metode usulan meningkatkan keselamatan?} Jawabannya, dengan
+catatan, ya. Pada ketiga pasangan yang dapat diuji secara statistik
+(Subbab~\ref{sec:analisis_keselamatan}), minimum clearance meningkat secara
+signifikan dengan \textit{effect size} besar, dan besarnya peningkatan
+absolut justru membesar seiring kompleksitas skenario: dari +0,007~m pada
+S2/S6 (lingkungan dengan satu \textit{obstacle} statis biasa), menjadi
++0,121~m pada S3/S7 dan +0,303~m pada S4/S8, dua kondisi yang melibatkan
+kucing pada area \textit{blind-spot}. Pola ini sejalan dengan rancangan
+metode usulan yang memang ditujukan untuk kondisi tersebut, bukan untuk
+lingkungan sederhana.
+
+\textbf{Apakah peningkatan keselamatan dibayar dengan penurunan efisiensi?}
+Ya, dan \textit{trade-off} ini konsisten di seluruh pasangan
+(Subbab~\ref{sec:tradeoff}). Waktu tempuh meningkat 15,5\% hingga 63,7\%,
+dengan kenaikan terbesar pada S3/S7 dan S4/S8, skenario yang sama yang
+menunjukkan peningkatan clearance paling besar. Panjang lintasan relatif
+tidak banyak berubah ($-0,7\%$ hingga $+5,9\%$), sehingga \textit{trade-off}
+utama terletak pada waktu dan kecepatan, bukan pada rute geometris yang
+ditempuh. Besarnya biaya ini perlu dibaca berdampingan dengan manfaat
+keselamatan yang diperoleh: pada S3/S7, kenaikan waktu 63,7\% disertai
+kenaikan clearance 198,4\%, sementara pada S2/S6, kenaikan waktu 15,5\%
+hanya disertai kenaikan clearance 1,6\%. \textit{Trade-off} pada pasangan
+kedua ini secara proporsional kurang menguntungkan dibandingkan pasangan
+pertama, meskipun kedua kombinasi signifikan secara statistik.
+
+\textbf{Apakah kualitas gerak tetap dapat diterima?} Hasil pada
+Subbab~\ref{sec:kehalusan_gerak} menunjukkan bahwa peningkatan keselamatan
+tidak menyebabkan perilaku navigasi yang ekstrem. Kecepatan angular rata-rata
+metode usulan justru lebih rendah pada S1/S5 dan S2/S6, sedikit lebih tinggi
+pada S3/S7, dan tidak berbeda signifikan pada S4/S8. Tidak satu pun trajektori
+yang diperiksa secara visual menunjukkan pola zig-zag tajam pada konfigurasi
+fuzzy, satu-satunya pola zig-zag tajam yang teramati justru muncul pada satu
+\textit{trial baseline} di S2. Variasi yang lebih besar pada S7 dibandingkan
+S3 lebih tepat digambarkan sebagai perbedaan konsistensi antar-\textit{trial},
+bukan ketidakstabilan gerak.
+
+\subsection{Evaluasi Kontribusi Setiap Komponen}
+
+Penelitian ini tidak melakukan \textit{ablation study}, sehingga kontribusi
+ketiga komponen metode usulan tidak dapat dipisahkan secara independen dari
+data eksperimen semata. Penting dicatat pula bahwa pada tingkat implementasi,
+ketiga komponen ini juga tidak benar-benar independen satu sama lain:
+penelusuran terhadap \texttt{APFPlanner} (Subbab~\ref{sec:arsitektur})
+menunjukkan bahwa mekanisme \textit{cat keep-out} dan fusi
+\textit{traversability} via operator minimum hanya aktif bersamaan dengan
+adaptasi fuzzy, dikendalikan oleh satu parameter \texttt{use\_fuzzy} yang
+sama. Dengan keterbatasan ini sebagai konteks, evaluasi berikut bersifat
+naratif berdasarkan rancangan, bukan klaim kausal yang teruji.
+
+\textit{Virtual blind-spot scan} (proyeksi blob termal menjadi
+\texttt{sensor\_msgs/LaserScan} pada Subbab~\ref{sec:proyeksi_scan})
+memungkinkan informasi kucing yang tidak terjangkau LiDAR dimanfaatkan oleh
+\textit{costmap} dan \textit{planner} berbasis \texttt{LaserScan}, kompatibel
+langsung dengan ekosistem ROS \textit{navigation stack} tanpa memerlukan
+modifikasi pada \textit{global planner}. Mekanisme ini secara desain aktif
+pada kedua konfigurasi, bukan eksklusif fuzzy. Fakta bahwa \textit{baseline}
+(S3) tetap mencapai 100\% keberhasilan dan \textit{collision-free} di sekitar
+kucing, meski dengan margin yang jauh lebih tipis (0,061~m) dibandingkan
+fuzzy (S7, 0,182~m), menjadi indikasi tidak langsung bahwa jalur informasi
+ini memang memberikan manfaat dasar pada kedua konfigurasi, tanpa virtual
+scan, LiDAR semata tidak memiliki cara untuk mengetahui keberadaan kucing
+sama sekali.
+
+Fusi \textit{traversability} (Subbab~\ref{sec:fusi_trav}) menggabungkan skor
+geometris dari LiDAR dengan skor termal melalui operator minimum
+($\tau_\text{eff} = \min(\tau_\text{LiDAR}, \hat{\tau}_\text{thermal})$),
+menghasilkan representasi kondisi lingkungan yang secara desain selalu
+mengambil estimasi yang lebih konservatif dari kedua sumber. Mekanisme ini
+hanya digunakan secara bermakna pada konfigurasi fuzzy; \textit{baseline}
+hanya menggunakan skor termal mentah pada formula \textit{gain crisp}-nya.
+Pola peningkatan clearance yang konsisten pada S3/S7 dan S4/S8 sejalan
+dengan desain operator minimum ini, meskipun karena keterikatannya dengan
+saklar fuzzy yang sama, kontribusinya tidak dapat dipisahkan dari adaptasi
+fuzzy itu sendiri.
+
+Adaptasi fuzzy Mamdani memungkinkan \texttt{speed\_scale} dan
+\texttt{rep\_gain} berubah secara adaptif berdasarkan jarak ke \textit{obstacle}
+terdekat dan $\tau_\text{eff}$, alih-alih formula \textit{crisp} tetap pada
+\textit{baseline}. Efeknya tampak konsisten pada pola kecepatan linear yang
+selalu lebih rendah pada konfigurasi fuzzy (Subbab~\ref{sec:tradeoff}) dan
+pada peningkatan clearance yang telah dibahas. Namun, mengingat fuzzy juga
+menjadi saklar yang mengaktifkan \textit{cat keep-out} dan penggunaan
+bermakna $\tau_\text{eff}$, peningkatan yang teramati pada eksperimen ini
+sebaiknya dipahami sebagai efek gabungan ketiga komponen yang bekerja
+sebagai satu kesatuan, bukan kontribusi adaptasi fuzzy semata.
+
+\subsection{Hubungan dengan Literatur}
+
+Karakteristik APF yang rentan terhadap osilasi di sekitar \textit{obstacle}
+pada \textit{local minima} telah dikenal sejak diperkenalkan oleh
+Khatib~\cite{Khatib1986} sebagai metode penghindaran reaktif berbasis gaya
+tarik-tolak. Penelitian ini tidak menghilangkan kerentanan tersebut secara
+fundamental, mekanisme deteksi osilasi pada Persamaan~\ref{eq:osc_detect}
+(Subbab~\ref{sec:algoritma_navigasi}) tetap berupa mitigasi reaktif, bukan
+perubahan formulasi APF itu sendiri seperti pendekatan \textit{subarea-APF}
+yang diusulkan Lv dkk.~\cite{Lv2024}. Temuan pada
+Subbab~\ref{sec:kehalusan_gerak}, bahwa kecepatan angular fuzzy justru lebih
+tinggi pada S3/S7, konsisten dengan pemahaman bahwa adaptasi fuzzy pada
+penelitian ini bekerja sebagai pengatur kecepatan dan penguatan repulsi,
+bukan sebagai solusi struktural atas osilasi APF.
+
+Pada sisi fusi sensor, pendekatan menggabungkan LiDAR dan kamera termal
+untuk mengatasi keterbatasan deteksi pada kondisi tertentu telah ditunjukkan
+pada penelitian fusi LiDAR--termal untuk kendaraan otonom~\cite{Choi2023}
+dan untuk lokalisasi pada lingkungan berbahaya~\cite{Schichler2025}. Hasil
+penelitian ini sejalan dengan temuan tersebut: kombinasi kedua modalitas
+sensor memungkinkan deteksi objek yang tidak terjangkau salah satu sensor
+saja. Pada konteks estimasi \textit{traversability} secara khusus, survei
+oleh Sevastopoulos dan Konstantopoulos~\cite{Sevastopoulos2022} menyoroti
+pentingnya representasi kondisi lingkungan yang konservatif untuk keperluan
+navigasi aman, sejalan dengan pemilihan operator minimum pada fusi
+\textit{traversability} penelitian ini.
+
+Pada sisi navigasi berbasis fuzzy, peningkatan keselamatan dengan
+\textit{trade-off} efisiensi yang masih dapat diterima juga ditemukan pada
+penelitian navigasi berbasis \textit{neuro-fuzzy} dan fusi sensor pada
+lingkungan padat \textit{obstacle}~\cite{Haider2022}, serta pada pengendali
+fuzzy logic ganda untuk navigasi pada lingkungan dinamis yang divalidasi
+baik secara simulasi maupun pada robot nyata Pioneer 3-DX~\cite{Benaicha2026}.
+Pola umum bahwa adaptasi fuzzy meningkatkan keamanan dengan konsekuensi pada
+efisiensi gerak, sebagaimana dilaporkan kedua penelitian tersebut, konsisten
+dengan apa yang ditemukan pada penelitian ini, meskipun besaran
+\textit{trade-off} yang dilaporkan tidak dapat dibandingkan secara langsung
+karena perbedaan platform, skenario uji, dan metrik yang digunakan.
+
+\subsection{Kontribusi Penelitian}
+
+Kontribusi metodologis penelitian ini meliputi integrasi blob termal menjadi
+\textit{virtual LaserScan} yang kompatibel langsung dengan \textit{costmap}
+ROS tanpa modifikasi \textit{global planner} (Subbab~\ref{sec:proyeksi_scan}),
+fusi \textit{traversability} LiDAR--termal melalui operator minimum dengan
+\textit{low-pass filter} asimetris yang secara desain konservatif terhadap
+keselamatan (Subbab~\ref{sec:fusi_trav}), dan adaptasi APF menggunakan fuzzy
+Mamdani yang mengendalikan dua parameter sekaligus (\texttt{speed\_scale} dan
+\texttt{rep\_gain}) berdasarkan kombinasi jarak \textit{obstacle} dan
+\textit{traversability} efektif (Subbab~\ref{sec:fuzzy_mamdani}).
+
+Kontribusi empiris meliputi peningkatan minimum clearance yang signifikan
+dan \textit{effect size} besar pada seluruh pasangan yang dapat diuji,
+particularly besar pada skenario \textit{blind-spot} dan dinamis;
+keberhasilan menutup satu-satunya celah kegagalan \textit{baseline} pada S4;
+serta kuantifikasi \textit{trade-off} efisiensi yang terukur dan dapat
+dipertimbangkan berdasarkan konteks aplikasi, bukan diklaim sebagai
+keunggulan mutlak.
+
+\subsection{Keterbatasan Penelitian}
+
+Beberapa keterbatasan perlu dicatat secara objektif. Seluruh eksperimen
+dilakukan pada simulasi Gazebo dan belum diuji pada robot fisik, sehingga
+faktor seperti \textit{noise} sensor nyata, dinamika kontak, dan variasi
+pencahayaan terhadap kamera termal belum tercakup. Penelitian ini tidak
+melakukan \textit{ablation study}, sehingga kontribusi relatif ketiga
+komponen metode usulan, yang juga secara arsitektural saling terikat pada
+saklar \texttt{use\_fuzzy} yang sama, tidak dapat dipisahkan. Jumlah
+\textit{trial} per skenario ($n=10$) relatif kecil untuk standar statistik
+umum, meskipun telah dipertimbangkan melalui uji non-parametrik dan
+pelaporan \textit{effect size}. Penelitian ini juga hanya menggunakan satu
+konfigurasi parameter fuzzy yang telah di-\textit{tuning} untuk delapan
+skenario spesifik, sehingga generalisasi terhadap \textit{rule base} atau
+\textit{membership function} yang berbeda, maupun terhadap skenario dengan
+kompleksitas lebih tinggi (misalnya \textit{obstacle} dinamis majemuk),
+belum dapat dipastikan.
+
+\subsection{Implikasi Penelitian}
+
+Secara akademik, penelitian ini menyediakan dasar empiris mengenai bagaimana
+fusi sensor LiDAR--termal dan adaptasi fuzzy dapat saling melengkapi pada
+navigasi berbasis APF, khususnya untuk kondisi \textit{blind-spot} yang
+relatif sedikit dibahas pada literatur navigasi mobile robot berbasis LiDAR
+tunggal. Secara praktis, pendekatan ini berpotensi relevan untuk robot
+layanan yang beroperasi pada lingkungan semi-terstruktur dengan kemungkinan
+kehadiran objek bersuhu tubuh pada area yang tidak terjangkau LiDAR, seperti
+fasilitas publik atau area dalam ruangan dengan lalu lintas manusia maupun
+hewan, meskipun penerapan langsung pada robot nyata memerlukan validasi
+lebih lanjut di luar lingkup penelitian ini.
+
+\subsection{Arah Pengembangan Selanjutnya}
+
+Beberapa arah pengembangan yang realistis meliputi pengujian pada robot
+fisik untuk memvalidasi temuan simulasi ini, pelaksanaan \textit{ablation
+study} dengan memisahkan saklar \textit{cat keep-out}, fusi
+\textit{traversability}, dan adaptasi kecepatan/penguatan fuzzy secara
+independen, eksplorasi \textit{rule base} fuzzy yang adaptif terhadap
+skenario alih-alih \textit{tuning} tetap, serta pertimbangan integrasi
+pembelajaran mesin untuk estimasi \textit{traversability} yang lebih
+generalis dibandingkan operator minimum berbasis aturan tetap saat ini.
+
+\subsection{Menjawab Hipotesis Penelitian}
+
+Penelitian ini belum memiliki rumusan hipotesis tertulis secara formal pada
+BAB I. Sebagai acuan, pertanyaan validasi hipotesis utama yang telah
+dirumuskan pada Subbab~\ref{sec:interpretasi}, yaitu apakah konfigurasi
+fuzzy secara signifikan meningkatkan clearance minimum dibandingkan
+\textit{baseline} pada skenario dengan \textit{obstacle} kucing (S3/S7),
+didukung oleh data pada penelitian ini ($p=0,0002$; $r=+1,00$). Tiga
+pertanyaan pendukung lainnya pada subbab yang sama, mengenai \textit{trade-off}
+waktu, kehalusan gerak, dan ketiadaan penurunan performa pada S1/S5, juga
+didukung sebagian besar oleh data, dengan satu pengecualian pada kecepatan
+angular S4/S8 yang tidak signifikan. Dukungan ini bersifat parsial dan
+spesifik konteks, tidak dapat dinyatakan sebagai pembuktian mutlak mengingat
+keterbatasan ukuran sampel, lingkup simulasi, dan ketidakhadiran
+\textit{ablation study} yang telah diuraikan di atas.
+
+Setelah seluruh hasil dibahas secara terintegrasi pada subbab ini, subbab
+berikutnya merangkum temuan utama penelitian sebelum memasuki BAB V,
+disajikan pada Subbab 4.9 Ringkasan Temuan BAB IV.

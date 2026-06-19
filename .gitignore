@@ -289,3 +289,21 @@ main.pdf
 
 # Backup files
 *.bkp
+
+
+# Generated PDF
+main.pdf
+lama_main.pdf
+
+# VSCode
+.vscode/
+
+# Linux
+.directory
+
+# Temporary
+build.log
+
+# Backup
+*.bkp
+*.backup

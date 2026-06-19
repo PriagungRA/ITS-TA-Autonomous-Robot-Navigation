@@ -4,22 +4,33 @@
 \section{Kesimpulan}
 \label{sec:kesimpulan}
 
-% [TEMPLATE] Tuliskan kesimpulan dari hasil penelitian Anda.
-% Jawab setiap tujuan/rumusan masalah yang telah ditetapkan di Bab 1.
-Berdasarkan hasil perancangan, implementasi, dan pengujian yang telah dilakukan, dapat diambil beberapa kesimpulan sebagai berikut:
+Berdasarkan hasil perancangan, implementasi, dan pengujian yang telah dilakukan, diperoleh beberapa kesimpulan sebagai berikut.
+
 \begin{enumerate}
-    \item Kesimpulan pertama dari hasil penelitian.
-    \item Kesimpulan kedua dari hasil penelitian.
-    \item Kesimpulan ketiga dari hasil penelitian.
-    \item Kesimpulan keempat dari hasil penelitian.
+
+\item Sistem navigasi robot beroda otonom berhasil dikembangkan dengan mengintegrasikan LiDAR 2D dan kamera termal melalui pendekatan \textit{decision-level fusion} untuk menghasilkan nilai \textit{effective traversability} sebagai representasi kondisi lingkungan.
+
+\item Logika fuzzy Mamdani berhasil diterapkan untuk menyesuaikan parameter navigasi APF secara adaptif berdasarkan jarak obstacle dan nilai \textit{effective traversability}, sehingga perilaku navigasi dapat disesuaikan dengan tingkat risiko lingkungan yang dihadapi robot.
+
+\item Integrasi kamera termal dan logika fuzzy Mamdani terbukti meningkatkan keselamatan navigasi dibandingkan konfigurasi baseline. Peningkatan tersebut ditunjukkan oleh kenaikan \textit{Success Rate}, \textit{Collision-Free Rate}, serta \textit{minimum clearance}, terutama pada skenario yang mengandung obstacle berprofil rendah dan obstacle dinamis.
+
+\item Metode yang diusulkan menghasilkan peningkatan waktu tempuh dan panjang lintasan dibandingkan konfigurasi baseline. Meskipun demikian, peningkatan tersebut masih berada dalam batas yang dapat diterima jika dibandingkan dengan peningkatan margin keselamatan yang diperoleh.
+
 \end{enumerate}
 
 \section{Saran}
 \label{chap:saran}
 
-% [TEMPLATE] Tuliskan saran untuk pengembangan penelitian selanjutnya.
-Dari hasil penelitian yang telah dilakukan, terdapat beberapa saran untuk pengembangan lebih lanjut:
+Berdasarkan hasil penelitian yang telah diperoleh, beberapa pengembangan yang dapat dilakukan pada penelitian selanjutnya adalah sebagai berikut.
+
 \begin{enumerate}
-    \item Saran pertama untuk pengembangan selanjutnya.
-    \item Saran kedua untuk pengembangan selanjutnya.
+
+\item Melakukan implementasi dan pengujian sistem pada robot fisik untuk mengevaluasi pengaruh faktor lingkungan nyata, seperti variasi temperatur, ketidakpastian sensor, serta dinamika pergerakan obstacle yang tidak sepenuhnya dapat direpresentasikan pada lingkungan simulasi.
+
+\item Mengembangkan metode pembentukan traversability termal yang lebih adaptif dengan memanfaatkan teknik segmentasi berbasis pembelajaran mendalam atau pendekatan per\-sepsi multimodal sehingga kualitas representasi lingkungan dapat ditingkatkan pada kondisi yang lebih kompleks.
+
+\item Mengkaji metode fusi sensor yang lebih lanjut, seperti \textit{feature-level fusion} atau pendekatan probabilistik, untuk meningkatkan kualitas integrasi informasi antara LiDAR dan kamera termal sehingga sistem memiliki robustitas yang lebih baik terhadap ketidakpastian pengukuran sensor.
+
+\item Mengintegrasikan metode navigasi lokal yang lebih robust terhadap permasalahan \textit{local minima} pada Artificial Potential Field, serta melakukan pengujian pada lingkungan dengan tingkat kompleksitas yang lebih tinggi, seperti jumlah obstacle yang lebih banyak, pergerakan obstacle yang lebih dinamis, atau skenario luar ruangan.
+
 \end{enumerate}

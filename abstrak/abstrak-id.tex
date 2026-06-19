@@ -11,7 +11,7 @@
 \setlength{\tabcolsep}{0pt}
 
 \noindent
-\begin{tabularx}{\textwidth}{l >{\centering}m{2em} X}
+\begin{tabularx}{\textwidth}{l >{\centering\arraybackslash}m{2em} >{\raggedright\arraybackslash}X}
   Nama Mahasiswa    & : & \name{}         \\
 
   Judul Tugas Akhir & : & \tatitle{}      \\
@@ -21,8 +21,6 @@
 \end{tabularx}
 \endgroup
 
-% [TEMPLATE] Isi paragraf berikut dengan abstrak tugas akhir Anda (maksimal 200 kata).
-% Abstrak berisi latar belakang singkat, tujuan, metode, hasil utama, dan kesimpulan.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Navigasi yang aman merupakan salah satu aspek penting pada robot bergerak otonom, terutama ketika robot beroperasi pada lingkungan yang mengandung obstacle statis maupun dinamis. Penggunaan LiDAR 2D sebagai sensor utama navigasi memiliki keterbatasan dalam mendeteksi obstacle yang berada di luar bidang pemindaian sehingga berpotensi menimbulkan area \textit{blind-spot} dan meningkatkan risiko tabrakan. Oleh karena itu, penelitian ini mengusulkan sistem navigasi robot beroda otonom berbasis logika fuzzy dengan fusi sensor LiDAR dan kamera termal untuk meningkatkan kualitas persepsi lingkungan dan keselamatan navigasi. Sistem yang dikembangkan menggunakan LiDAR 2D untuk memperoleh informasi geometris lingkungan dan kamera termal untuk memperoleh informasi tambahan mengenai area yang dapat dilalui serta area yang mengandung obstacle. Informasi dari kedua sensor diolah menjadi traversability LiDAR dan traversability termal yang kemudian digabungkan melalui pendekatan \textit{decision-level fusion} untuk menghasilkan \textit{effective traversability}. Nilai tersebut digunakan sebagai masukan logika fuzzy Mamdani untuk menyesuaikan parameter navigasi \textit{Artificial Potential Field} (APF) secara adaptif berdasarkan kondisi lingkungan yang diamati robot. Sistem diimplementasikan pada ROS Noetic dan dievaluasi pada simulator Gazebo menggunakan delapan skenario pengujian yang mencakup lingkungan terbuka, obstacle statis, obstacle berprofil rendah pada area \textit{blind-spot} LiDAR, serta obstacle dinamis. Hasil pengujian menunjukkan bahwa metode yang diusulkan mampu meningkatkan reliabilitas dan keselamatan navigasi dibandingkan konfigurasi baseline, yang ditunjukkan melalui peningkatan \textit{Success Rate}, \textit{Collision-Free Rate}, dan \textit{minimum clearance}, terutama pada skenario yang mengandung obstacle berprofil rendah dan obstacle dinamis. Meskipun menghasilkan peningkatan waktu tempuh dan panjang lintasan, metode yang diusulkan mampu mempertahankan margin keselamatan yang lebih besar terhadap obstacle selama navigasi berlangsung. Berdasarkan hasil penelitian, dapat disimpulkan bahwa integrasi kamera termal, fusi traversability, dan logika fuzzy Mamdani pada sistem navigasi berbasis APF berhasil meningkatkan kualitas persepsi lingkungan dan keselamatan navigasi robot bergerak otonom dibandingkan pendekatan yang hanya mengandalkan LiDAR.
 
-Kata Kunci: Kata Kunci 1, Kata Kunci 2, Kata Kunci 3, Kata Kunci 4, Kata Kunci 5
+Kata Kunci: robot bergerak otonom, LiDAR 2D, kamera termal, traversability, fusi sensor, logika fuzzy Mamdani, Artificial Potential Field.

@@ -1,0 +1,120 @@
+Subbab~\ref{sec:pembahasan_terintegrasi} telah membahas secara terintegrasi
+mengapa pola-pola pada hasil eksperimen muncul dan bagaimana pola tersebut
+berkaitan dengan rancangan metode usulan. Subbab ini menutup BAB IV dengan
+merangkum temuan utama dari delapan skenario, sepuluh \textit{trial} per
+skenario, dan seluruh analisis deskriptif, statistik, serta kualitatif yang
+telah dilakukan, sebagai jembatan menuju kesimpulan akhir pada BAB V.
+
+\subsection{Ringkasan Temuan Utama}
+
+Pada aspek keberhasilan navigasi, metode usulan mempertahankan tingkat
+keberhasilan penuh pada seluruh skenario yang diujikan padanya, termasuk
+pada kondisi \textit{obstacle} dinamis yang menjadi satu-satunya kondisi
+\textit{baseline} mengalami kegagalan. Hal ini tidak berarti \textit{baseline}
+gagal secara umum, karena \textit{baseline} tetap berhasil pada sebagian
+besar skenarionya, namun metode usulan terbukti menutup celah kegagalan yang
+muncul pada kondisi paling menantang.
+
+Pada aspek keselamatan, minimum clearance meningkat secara konsisten, dan
+peningkatan ini tidak merata, melainkan membesar seiring kompleksitas
+skenario. Pada lingkungan sederhana tanpa \textit{obstacle}, perubahan tidak
+relevan untuk dievaluasi; pada lingkungan dengan \textit{obstacle} statis
+tunggal, peningkatan tergolong kecil; sementara pada kondisi yang melibatkan
+\textit{blind-spot} dan \textit{obstacle} dinamis, peningkatan margin
+keselamatan paling nyata. Pola ini menunjukkan bahwa kontribusi metode
+usulan paling terasa justru pada kondisi yang memang menjadi sasaran
+rancangannya, bukan pada kondisi navigasi yang sudah sederhana sejak awal.
+
+Pada aspek efisiensi, peningkatan keselamatan tersebut tidak diperoleh
+tanpa konsekuensi. Waktu tempuh meningkat pada seluruh pasangan skenario,
+dengan besaran yang sebagian besar berbanding lurus dengan besarnya
+peningkatan keselamatan, meskipun tidak selalu proporsional secara seimbang.
+Panjang lintasan, sebaliknya, relatif tidak banyak berubah, sehingga
+\textit{trade-off} yang terjadi lebih tepat dipahami sebagai konsekuensi
+pada kecepatan dan durasi gerak, bukan pada rute geometris yang dipilih
+robot. \textit{Trade-off} ini sebaiknya dibaca sebagai pertimbangan yang
+melekat pada pendekatan yang lebih konservatif, bukan sebagai kelemahan
+mutlak metode usulan.
+
+Pada aspek kualitas gerak, tidak ditemukan indikasi bahwa peningkatan
+keselamatan dicapai melalui perilaku navigasi yang ekstrem. Pemeriksaan
+visual terhadap trajektori tidak menemukan pola zig-zag tajam pada
+konfigurasi manapun, secara angular velocity, kecepatan angular metode
+usulan bahkan lebih rendah pada sebagian skenario, meski pada skenario
+lain justru sedikit lebih tinggi atau tidak berbeda secara berarti. Kualitas
+gerak metode usulan dengan demikian tetap berada pada tingkat yang dapat
+diterima, tanpa dapat diklaim secara seragam "lebih halus" pada seluruh
+kondisi.
+
+Secara statistik, hampir seluruh perbedaan yang diuji pada penelitian ini
+signifikan, dan effect size yang menyertainya secara umum tergolong besar,
+menunjukkan bahwa perbedaan-perbedaan tersebut bukan sekadar artefak
+ukuran sampel. Meski demikian, signifikansi statistik pada penelitian ini
+beberapa kali tidak berbanding lurus dengan besarnya selisih absolut yang
+relevan secara praktis, sehingga interpretasi setiap hasil tetap dilakukan
+dengan mempertimbangkan konteks aplikasi yang dituju, bukan semata dari
+nilai $p$ atau $r$.
+
+\subsection{Menjawab Tujuan Penelitian}
+
+BAB I pada naskah ini belum memuat rumusan tujuan penelitian secara
+definitif. Sebagai acuan kerja, tujuan yang secara konsisten mendasari
+rancangan metode pada BAB III dan pengujian pada BAB IV ini adalah
+mengevaluasi apakah integrasi \textit{virtual blind-spot scan}, fusi
+\textit{traversability} LiDAR--termal, dan adaptasi fuzzy Mamdani dapat
+meningkatkan keselamatan navigasi robot pada kondisi \textit{blind-spot}
+dan lingkungan dinamis, tanpa mengorbankan performa secara berlebihan.
+Berdasarkan acuan tersebut, hasil penelitian ini mendukung bahwa integrasi
+ketiga komponen tersebut meningkatkan margin keselamatan secara terukur
+pada kondisi yang dituju, dengan konsekuensi efisiensi yang dapat
+dikuantifikasi dan dipertimbangkan, bukan konsekuensi yang tidak terkendali.
+Penelitian ini tidak mendukung klaim bahwa metode usulan berhasil sempurna
+atau selalu lebih baik pada seluruh kondisi, mengingat peningkatan yang
+tidak merata dan satu kombinasi metrik yang tidak menunjukkan perbedaan
+signifikan.
+
+\subsection{Menjawab Pertanyaan Penelitian}
+
+Empat pertanyaan yang telah dirumuskan pada Subbab~\ref{sec:interpretasi}
+dapat dijawab sebagai berikut. Pertanyaan mengenai peningkatan clearance
+pada skenario dengan kucing pada \textit{blind-spot}, sebagai validasi
+hipotesis utama penelitian, didukung kuat oleh data. Pertanyaan mengenai
+\textit{trade-off} waktu tempuh pada skenario kompleks juga terjawab,
+\textit{trade-off} tersebut memang ada dan cukup besar, bukan sekadar
+perubahan kecil yang dapat diabaikan. Pertanyaan mengenai kehalusan gerak
+melalui kecepatan angular hanya terjawab sebagian, karena metode usulan
+tidak secara seragam menghasilkan kecepatan angular yang lebih rendah pada
+seluruh skenario. Pertanyaan mengenai ketiadaan penurunan performa pada
+kondisi tanpa \textit{obstacle} terjawab untuk aspek keberhasilan dan
+keselamatan, yang tidak menurun sama sekali, meski metrik efisiensi pada
+kondisi ini tetap menunjukkan perbedaan statistik, sehingga jawaban atas
+pertanyaan ini tidak sepenuhnya bersih dari catatan.
+
+\subsection{Posisi Temuan Penelitian}
+
+Secara keseluruhan, temuan penelitian ini menunjukkan bahwa pendekatan yang
+lebih konservatif, dalam arti lebih berhati-hati merespons \textit{obstacle}
+dan memperlambat gerak saat diperlukan, dapat meningkatkan keselamatan
+navigasi secara terukur. Konsekuensinya terhadap efisiensi juga nyata dan
+tidak dapat diabaikan begitu saja. Posisi ini menempatkan metode usulan
+bukan sebagai solusi yang unggul pada seluruh aspek, melainkan sebagai
+satu titik keseimbangan tertentu antara keselamatan dan efisiensi, yang
+kelayakannya pada akhirnya bergantung pada kebutuhan aplikasi yang dituju,
+apakah keselamatan ekstra tersebut sepadan dengan tambahan waktu tempuh
+yang menyertainya.
+
+\subsection{Keterbatasan Ringkas}
+
+Sebagai pengingat sebelum menutup BAB IV, hasil-hasil di atas diperoleh
+sepenuhnya dari simulasi Gazebo dan belum diuji pada robot fisik, serta
+belum melalui \textit{ablation study} yang dapat memisahkan kontribusi
+masing-masing komponen metode usulan secara independen. Pembahasan lebih
+lengkap mengenai keterbatasan ini telah disajikan pada
+Subbab~\ref{sec:pembahasan_terintegrasi}.
+
+Hasil eksperimen dan pembahasan pada BAB IV ini telah memberikan gambaran
+menyeluruh mengenai performa metode usulan, mencakup keberhasilan,
+keselamatan, efisiensi, dan kualitas gerak, beserta konteks dan batasannya.
+BAB selanjutnya menyajikan kesimpulan akhir penelitian serta saran untuk
+pengembangan lebih lanjut, berdasarkan seluruh temuan yang telah dirangkum
+pada subbab ini.
