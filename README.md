@@ -1,87 +1,87 @@
-# Template LaTeX Buku Tugas Akhir ITS
+# ITS Undergraduate Thesis
 
-Template LaTeX resmi untuk buku tugas akhir ITS berdasarkan SK Rektor ITS No. 280 Tahun 2022, dengan struktur dan format yang telah disesuaikan untuk kebutuhan penulisan tugas akhir.
+## Autonomous Wheeled Robot Navigation Based on Fuzzy Logic Using LiDAR and Thermal Camera
 
+This repository contains the complete LaTeX source code of an undergraduate thesis submitted to the Department of Electrical Engineering, Institut Teknologi Sepuluh Nopember (ITS), Surabaya, Indonesia.
 
-## Fitur
+---
 
-- Format halaman, margin, dan font sesuai aturan ITS
-- Dilengkapi bagian-bagian standar buku tugas akhir (sampul, lembar pengesahan, abstrak, kata pengantar, daftar isi, bab, daftar pustaka, lampiran, biografi penulis)
-- Daftar pustaka otomatis menggunakan biblatex dengan gaya APA
-- Penomoran gambar, tabel, dan referensi otomatis
-- Dukungan berbagai format gambar (JPEG, PNG)
-- Daftar, persamaan ilmiah, dan tabel
-- Kompilasi otomatis melalui GitHub Actions
-- Dilengkapi contoh penulisan: persamaan, tabel, kode program, figure, subfigure, timeline, dan lainnya
+## Author
 
-## Struktur direktori
+**Priagung Ramadhan Alfalakhi**
+NRP: 5022221161
+Department of Electrical Engineering
+Institut Teknologi Sepuluh Nopember (ITS)
 
+---
+
+## Thesis Abstract
+
+This research proposes an autonomous wheeled robot navigation system that integrates LiDAR sensing and thermal camera perception through a Mamdani fuzzy logic framework. The system combines obstacle information obtained from LiDAR with traversability estimation derived from thermal image segmentation to improve navigation safety, particularly in areas that are difficult to observe using a single sensor modality. Artificial Potential Field (APF) is employed as the local navigation strategy, while fuzzy inference dynamically adjusts navigation behavior according to environmental conditions.
+
+The proposed approach is evaluated in multiple indoor simulation scenarios using ROS and Gazebo, including environments with static and dynamic obstacles. Experimental results demonstrate that the integration of fuzzy logic and multi-sensor perception can improve navigation robustness and obstacle avoidance performance.
+
+---
+
+## Research Areas
+
+* Autonomous Mobile Robots
+* Robot Navigation
+* LiDAR Perception
+* Thermal Vision
+* Sensor Fusion
+* Mamdani Fuzzy Logic
+* Artificial Potential Field (APF)
+* ROS Navigation Stack
+* Gazebo Simulation
+
+---
+
+## Repository Structure
+
+```text
+.
+├── abstrak/      # Indonesian and English abstracts
+├── bab/          # Thesis chapters
+├── gambar/       # Figures and illustrations
+├── lampiran/     # Appendices
+├── lainnya/      # Acknowledgement, biography, approval pages
+├── pustaka/      # Bibliography and thesis variables
+├── sampul/       # Thesis cover files
+└── main.tex      # Main LaTeX document
 ```
-├── main.tex                  # Dokumen utama
-├── abstrak/                  # Abstrak Bahasa Indonesia dan Inggris
-├── bab/                      # File .tex per bab dan sub-bab
-├── gambar/                   # Berkas gambar
-├── lainnya/                  # Lembar pengesahan, kata pengantar, pernyataan, biografi
-├── program/                  # Contoh kode program
-├── lampiran/                 # Kode program lampiran
-├── pustaka/                  # Daftar pustaka (.bib) dan variabel identitas
-└── sampul/                   # Sampul luar dan dalam
-```
 
-## Cara menggunakan
+---
 
-1. Isi identitas Anda di `pustaka/variables.tex`
-2. Ubah judul dan konten abstrak di `abstrak/`
-3. Ubah lembar pengesahan dan pernyataan keaslian di `lainnya/` (atau gunakan file PDF)
-4. Tulis bab-bab di `bab/` dan subdirektorinya
-5. Tambahkan gambar ke `gambar/`
-6. Tambahkan daftar pustaka ke `pustaka/pustaka.bib`
-7. Kompilasi dengan `pdflatex`, `biber`, `pdflatex` (atau gunakan GitHub Actions)
+## Compilation
 
-## Prasyarat
-
-Sebelum mengompilasi, pastikan telah menginstal:
-
-- **TeX Live** (disarankan) — https://tug.org/texlive/
-  - Atau distribusi LaTeX lain (MiKTeX, etc.)
-- Paket-paket berikut (otomatis tersedia pada instalasi TeX Live penuh):
-  - `biblatex` + `biber` (daftar pustaka gaya APA)
-  - `listings` (kode program)
-  - `txfonts` (font Times)
-  - `amsmath`, `amssymb` (matematika)
-  - `graphicx`, `subcaption`, `float` (gambar)
-  - `tabularx`, `longtable`, `makecell`, `multirow`, `booktabs`, `colortbl` (tabel)
-  - `titlesec`, `fancyhdr` (tata letak halaman)
-  - `hyperref` (PDF metadata)
-
-## Kompilasi
-
-Jalankan perintah berikut secara berurutan:
+Compile using XeLaTeX and Biber:
 
 ```bash
-pdflatex main
+xelatex main.tex
 biber main
-pdflatex main
-pdflatex main
+xelatex main.tex
+xelatex main.tex
 ```
 
-Atau gunakan `latexmk` untuk kompilasi otomatis:
+or
 
 ```bash
-latexmk -pdf main
+latexmk -xelatex main.tex
 ```
 
-Repositori ini juga dilengkapi **GitHub Actions** (`.github/workflows/ci.yaml`) yang akan mengompilasi dan mendeploy PDF ke GitHub Pages setiap kali ada push ke branch `main`.
+---
 
-## Referensi
+## Related Repository
 
-Template ini merupakan modifikasi dari:
+The implementation source code, ROS packages, simulation environment, and experimental framework used in this research are available at:
 
-1. [**template-buku-ta-its**](https://github.com/b201lab/template-buku-ta-its) — template resmi LaTeX buku tugas akhir ITS berdasarkan SK Rektor ITS No. 280 Tahun 2022.
-2. [**TUGAS-AKHIR**](https://github.com/AgathaSamuel/TUGAS-AKHIR) — buku tugas akhir Agatha Samuel Sitompul yang dikembangkan dari template di atas dengan penambahan fitur penulisan (persamaan, tabel, kode, timeline, subfigures, dll.).
+https://github.com/PriagungRA/TA-Autonomous-Robot-Navigation-Fuzzy-Lidar-Thermal
 
-## Lisensi
+---
 
-MIT
+## License
 
+This repository is provided for academic and educational purposes.
 
+© Priagung Ramadhan Alfalakhi
