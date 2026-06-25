@@ -17,40 +17,22 @@ Sementara itu, sistem fuzzy menghasilkan dua variabel keluaran, yaitu:
 \item \textit{Repulsive Gain} ($G$), yang digunakan untuk mengatur kekuatan gaya tolak obstacle pada APF.
 \end{enumerate}
 
-Tabel~\ref{tab:variabel_fuzzy} menunjukkan rentang setiap variabel yang digunakan dalam sistem fuzzy.
+Tabel~\ref{tab:fuzzy_var} menunjukkan rentang setiap variabel yang digunakan dalam sistem fuzzy.
 
-\begin{table}[H]
-\centering
-\caption{Variabel masukan dan keluaran sistem fuzzy}
-\label{tab:variabel_fuzzy}
-\begin{tabular}{llll}
-\toprule
-\textbf{Variabel} &
-\textbf{Simbol} &
-\textbf{Jenis} &
-\textbf{Rentang} \\
-\midrule
-Jarak obstacle &
-$d_{obs}$ &
-Masukan &
-0 -- 6 m \\
-
-Traversability efektif &
-$\tau_{eff}$ &
-Masukan &
-0 -- 1 \\
-
-Speed Scale &
-$S$ &
-Keluaran &
-0 -- 1 \\
-
-Repulsive Gain &
-$G$ &
-Keluaran &
-0 -- 1 \\
-\bottomrule
-\end{tabular}
+\begin{table}[h]
+    \centering
+    \caption{Variabel masukan dan keluaran sistem fuzzy}
+    \label{tab:fuzzy_var}
+    \begin{tabular}{llcl}
+        \hline
+        Variabel & Simbol & Jenis & Rentang \\
+        \hline
+        Jarak obstacle      & $d_{obs}$     & Masukan & $0 - 2$ m \\
+        Traversability efektif & $\tau_{eff}$ & Masukan & $0 - 1$ \\
+        Speed Scale         & $S$           & Keluaran & $0 - 1$ \\
+        Repulsive Gain      & $G$           & Keluaran & $0{,}5 - 2{,}5$ \\
+        \hline
+    \end{tabular}
 \end{table}
 
 % \subsection{Fungsi Keanggotaan}
@@ -417,4 +399,128 @@ dengan:
 \item $G$ adalah keluaran \textit{Repulsive Gain}.
 \end{itemize}
 
-Melalui mekanisme tersebut, robot dapat bergerak lebih cepat ketika kondisi lingkungan aman dan secara otomatis memperlambat pergerakan serta meningkatkan kemampuan penghindaran obstacle ketika traversability menurun atau obstacle berada pada jarak yang dekat. Integrasi ini menghasilkan sistem \textit{Fuzzy-Adaptive Artificial Potential Field} yang lebih adaptif dibandingkan APF konvensional dengan parameter tetap.
+Melalui mekanisme tersebut, robot dapat bergerak lebih cepat ketika kondisi lingkungan aman dan secara otomatis memperlambat pergerakan serta meningkatkan kemampuan penghindaran obstacle ketika traversability menurun atau obstacle berada pada jarak yang dekat. 
+Integrasi ini menghasilkan sistem \textit{Fuzzy-Adaptive Artificial Potential Field} yang lebih adaptif dibandingkan APF konvensional dengan parameter tetap. Selain modulasi kecepatan dan gaya tolak berbasis fuzzy, sistem pada konfigurasi fuzzy juga mengimplementasikan mekanisme jaga-jarak khusus terhadap obstacle termal berprofil rendah yang dijelaskan pada Subbab~\ref{sec:cat_keepout}.
+
+\subsection{Mekanisme Jaga-Jarak Obstacle Termal (\textit{Cat Keep-out})}
+\label{sec:cat_keepout}
+ 
+Obstacle berprofil rendah seperti \texttt{obstacle\_cat} tidak dapat
+dideteksi secara langsung oleh sensor LiDAR karena berada di bawah
+bidang pindai horizontal. Meskipun informasi keberadaannya telah
+diproyeksikan ke dalam \textit{virtual LaserScan} dan \textit{global
+costmap} sebagaimana dijelaskan pada Subbab 3.6.1, frekuensi
+pembaruan \textit{costmap} yang rendah (0,2~Hz) menyebabkan
+keterlambatan respons \textit{local planner} terhadap pergerakan
+obstacle secara dinamis. Untuk mengatasi keterbatasan tersebut, pada
+konfigurasi fuzzy ditambahkan komponen gaya tolak khusus yang bekerja
+secara reaktif pada frekuensi perencanaan lokal (10~Hz), yaitu gaya
+jaga-jarak obstacle termal ($F_{cat}$).
+ 
+% ---- a. Estimasi Posisi Obstacle Termal ----
+ 
+\subsubsection*{a. Estimasi Posisi Obstacle Termal}
+ 
+Posisi obstacle termal diperoleh dari data
+\texttt{/thermal\_blindspot\_scan} yang dipublikas\-ikan oleh node
+\texttt{thermal\_blindspot\_to\_scan.py}. Setiap siklus perencanaan,
+komponen jarak ke tepi obstacle ($D_{tcat}$) dan sudut arah obstacle
+($\theta_{cat}$) diekstraksi dari \textit{scan} tersebut. Posisi
+obstacle dalam koordinat dunia dihitung menggunakan:
+ 
+\begin{equation}
+    x_{cat} = x_{robot} + (D_{tcat} + r_{cat})
+              \cos(\psi_{robot} + \theta_{cat})
+    \label{eq:xcat}
+\end{equation}
+ 
+\begin{equation}
+    y_{cat} = y_{robot} + (D_{tcat} + r_{cat})
+              \sin(\psi_{robot} + \theta_{cat})
+    \label{eq:ycat}
+\end{equation}
+ 
+dengan $r_{cat} = 0{,}18$~m adalah radius obstacle termal dan
+$\psi_{robot}$ adalah orientasi robot pada koordinat dunia. Jarak
+dari robot ke pusat obstacle termal kemudian dihitung sebagai:
+ 
+\begin{equation}
+    d_{cat} = \sqrt{(x_{robot} - x_{cat})^{2} +
+                    (y_{robot} - y_{cat})^{2}}
+    \label{eq:dcat}
+\end{equation}
+ 
+Untuk menjaga stabilitas estimasi posisi obstacle yang bergerak,
+sistem menerapkan mek\-anisme \textit{latch} selama $t_{latch} = 2{,}0$
+detik. Posisi obstacle yang terakhir terdeteksi dipertahankan selama
+durasi tersebut meskipun deteksi termal sesaat menghilang, sehingga
+robot tidak langsung mengabaikan obstacle yang bergerak cepat atau
+terhalang secara sementara.
+ 
+% ---- b. Profil Gaya Jaga-Jarak ----
+ 
+\subsubsection*{b. Profil Gaya Jaga-Jarak}
+
+Gaya jaga-jarak obstacle termal menggunakan formulasi repulsif
+yang konsisten dengan prinsip APF, dengan gain tetap $k_{cat} = 3{,}0$
+yang lebih besar dari gain gaya tolak obstacle umum. Batas pengaruh
+zona jaga-jarak ditetapkan sebagai:
+
+\begin{equation}
+    D_{safe} = r_{cat} + \frac{w_{robot}}{2} + \delta_{margin}
+             = 0{,}18 + 0{,}275 + 0{,}08 = 0{,}535~\text{m}
+    \label{eq:dsafe}
+\end{equation}
+
+\begin{equation}
+    d_{0c} = D_{safe} + \delta_{influence}
+           = 0{,}535 + 0{,}35 = 0{,}885~\text{m}
+    \label{eq:d0c}
+\end{equation}
+
+dengan $D_{safe} = r_{cat} + w_{robot}/2 + \delta_{margin}
+= 0{,}535$~m adalah jarak aman minimum robot terhadap pusat
+obstacle termal. Besar gaya jaga-jarak dihitung sebagai:
+
+\begin{equation}
+    f_{cat} =
+    \begin{cases}
+        k_{cat} \cdot
+        \left(\dfrac{1}{d_{cat}} - \dfrac{1}{d_{0c}}\right)
+        \cdot \dfrac{1}{d_{cat}^{2}}
+            & d_{cat} \leq d_{0c} \\[10pt]
+        0   & d_{cat} > d_{0c}
+    \end{cases}
+    \label{eq:fcat}
+\end{equation}
+
+Komponen vektor dalam arah $x$ dan $y$ dihitung sebagai:
+
+\begin{equation}
+    F_{cat,x} = f_{cat} \cdot \frac{x_{robot} - x_{cat}}{d_{cat}},
+    \qquad
+    F_{cat,y} = f_{cat} \cdot \frac{y_{robot} - y_{cat}}{d_{cat}}
+    \label{eq:fcatvec}
+\end{equation}
+
+% ---- c. Penjumlahan Gaya Total ----
+ 
+\subsubsection*{c. Penjumlahan Gaya Total}
+ 
+Gaya total yang digunakan untuk menghasilkan perintah kecepatan robot
+merupakan superposisi dari seluruh komponen gaya APF:
+ 
+\begin{equation}
+    \mathbf{F}_{total} = \mathbf{F}_{att} + \mathbf{F}_{rep}
+                       + \mathbf{F}_{cat}
+    \label{eq:ftotal}
+\end{equation}
+ 
+Komponen $\mathbf{F}_{cat}$ hanya aktif pada konfigurasi fuzzy
+(\texttt{use\_fuzzy = true}). Pada konfigurasi baseline,
+$\mathbf{F}_{cat} = \mathbf{0}$ sehingga respons terhadap obstacle
+termal sepenuhnya bergantung pada mekanisme \textit{rerouting} yang
+dilakukan oleh global planner berdasarkan pembaruan \textit{costmap}
+berkala. Hal ini menjadi salah satu perbedaan mendasar antara kedua
+konfigurasi dalam hal kemampuan respons reaktif terhadap obstacle
+berprofil rendah pada area \textit{blind-spot} LiDAR.

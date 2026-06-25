@@ -119,31 +119,38 @@ Pada skenario S4 dan S8, mekanisme \textit{dynamic prediction} dan \textit{tempo
 Pada seluruh skenario, posisi awal robot ditetapkan pada koordinat yang sama, sedangkan posisi tujuan ditentukan pada titik akhir koridor navigasi. Dengan konfigurasi tersebut, seluruh percobaan dilakukan pada kondisi awal yang identik sehingga hasil pengujian dapat dibandingkan secara adil.
 
 \subsection{Konfigurasi Baseline dan Fuzzy}
+\label{sec:konfigurasi_baseline_fuzzy}
 
-Konfigurasi baseline (S1--S4) menggunakan APFPlanner dengan parameter navigasi yang bersifat tetap. Pada konfigurasi ini, kecepatan robot dan penguatan gaya tolak obstacle dihitung menggunakan parameter bawaan APF tanpa mekanisme adaptasi.
+Konfigurasi baseline (S1--S4) menggunakan APFPlanner dengan parameter navigasi yang bersifat tetap. Pada konfigurasi ini, penguatan gaya tolak obstacle dihitung menggunakan \textit{base gain} berbasis nilai traversability termal mentah ($\tau_{raw}$) secara heuristik, yaitu:
+ 
+\begin{equation}
+    G_{baseline} = 1{,}0 + (1{,}0 - \tau_{raw})
+    \label{eq:base_gain_baseline}
+\end{equation}
+ 
+Formulasi tersebut menghasilkan penguatan gaya tolak yang meningkat secara linear keti\-ka traversability menurun, tanpa memanfaatkan informasi traversability LiDAR maupun meka\-nisme adaptasi berbasis logika fuzzy. Selain itu, gaya jaga-jarak obstacle termal ($F_{cat}$) seb\-agaimana dijelaskan pada Subbab~\ref{sec:cat_keepout} tidak diaktifkan pada konfigurasi ini.
+ 
+Sebaliknya, konfigurasi fuzzy (S5--S8) menggunakan pengendali fuzzy Mamdani yang telah dijelaskan pada Subbab~\ref{sec:fuzzy_Aapf}. Nilai traversability efektif $\tau_{eff}$ dan jarak obstacle terdekat $d_{obs}$ digunakan sebagai masukan fuzzy untuk menghasilkan parameter $S$ (speed scale) dan $G$ (repulsive gain) secara adaptif, sehingga penguatan gaya tolak tidak lagi bersifat linear melainkan bergantung pada kombinasi kedua kondisi lingkungan tersebut. Pada konfigurasi ini, komponen $\mathbf{F}_{cat}$ juga diaktifkan untuk memberikan respons reaktif terhadap obstacle termal berprofil rendah.
 
-Sebaliknya, konfigurasi fuzzy (S5--S8) menggunakan pengendali fuzzy Mamdani yang telah dijelaskan pada Subbab~\ref{sec:fuzzy_Aapf}. Nilai traversability efektif dan jarak obstacle terdekat digunakan sebagai masukan fuzzy untuk menghasilkan parameter \textit{speed scale} dan \textit{repulsive gain} secara adaptif.
+Perbedaan utama kedua konfigurasi dirangkum pada Tabel~\ref{tab:konfigurasi}.
 
-Perbedaan utama kedua konfigurasi dirangkum pada Tabel~\ref{tab:konfigurasi_eksperimen}.
-
-\begin{table}[H]
-\centering
-\caption{Perbandingan konfigurasi eksperimen}
-\label{tab:konfigurasi_eksperimen}
-\begin{tabular}{lll}
-\toprule
-\textbf{Komponen} &
-\textbf{Baseline} &
-\textbf{Fuzzy} \\
-\midrule
-LiDAR & Aktif & Aktif \\
-Kamera termal & Aktif & Aktif \\
-Virtual LaserScan & Aktif & Aktif \\
-Fusi traversability & Aktif & Aktif \\
-APFPlanner & Aktif & Aktif \\
-Fuzzy Mamdani & Tidak aktif & Aktif \\
-\bottomrule
-\end{tabular}
+\begin{table}[h]
+    \centering
+    \caption{Perbandingan konfigurasi eksperimen}
+    \label{tab:konfigurasi}
+    \begin{tabular}{lcc}
+        \hline
+        Komponen & Baseline & Fuzzy \\
+        \hline
+        LiDAR                          & Aktif       & Aktif \\
+        Kamera termal                  & Aktif       & Aktif \\
+        \textit{Virtual LaserScan}     & Aktif       & Aktif \\
+        Fusi traversability            & Aktif       & Aktif \\
+        APFPlanner                     & Aktif       & Aktif \\
+        Fuzzy Mamdani                  & Tidak aktif & Aktif \\
+        Gaya jaga-jarak termal ($F_{cat}$) & Tidak aktif & Aktif \\
+        \hline
+    \end{tabular}
 \end{table}
 
 \subsection{Prosedur Pelaksanaan Eksperimen}
