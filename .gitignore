@@ -307,3 +307,4 @@ build.log
 # Backup
 *.bkp
 *.backup
+*.pdf
