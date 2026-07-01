@@ -39,16 +39,15 @@ Berdasarkan latar belakang yang telah diuraikan, permasalahan yang dibahas dalam
 Agar penelitian memiliki ruang lingkup yang jelas dan terfokus, beberapa batasan masalah yang digunakan dalam penelitian ini adalah sebagai berikut.
 
 \begin{enumerate}
-\item Penelitian difokuskan pada sistem navigasi robot beroda otonom yang beroperasi pada lingkungan indoor.
-\item Sensor yang digunakan terdiri atas LiDAR dua dimensi (LiDAR 2D) dan kamera termal. Sensor lain seperti kamera RGB, LiDAR tiga dimensi, radar, maupun sensor kedalaman tidak digunakan dalam penelitian ini.
-\item Data kamera termal digunakan untuk membentuk informasi traversability termal dan \textit{virtual LaserScan} sebagai pelengkap informasi yang diperoleh dari LiDAR 2D.
-\item Fusi sensor dilakukan pada tingkat representasi traversability sehingga penelitian tidak membahas fusi data mentah (\textit{raw data fusion}) maupun fusi berbasis deteksi objek.
-\item Metode navigasi lokal yang digunakan adalah \textit{Artificial Potential Field} (APF) yang diimplementasikan sebagai \textit{local planner} pada ROS Navigation Stack.
-\item Pengendali yang digunakan untuk mengatur parameter navigasi adalah logika fuzzy Ma\-mdani dengan variabel masukan berupa jarak obstacle terdekat dan nilai traversability efektif hasil fusi sensor.
-\item Parameter navigasi yang diadaptasikan oleh sistem fuzzy dibatasi pada \textit{speed scale} dan \textit{repulsive gain} dari APF.
-\item Pengujian dilakukan pada lingkungan simulasi menggunakan ROS Noetic dan Gazebo sehingga penelitian tidak membahas implementasi pada robot fisik maupun pengaruh kondisi sensor nyata terhadap performa sistem.
-\item Evaluasi difokuskan pada aspek keselamatan dan performa navigasi yang meliputi \textit{Success Rate}, \textit{Collision-Free Rate}, \textit{minimum clearance}, waktu tempuh, panjang lintasan, serta karakteristik pergerakan robot.
-\item Penelitian tidak membahas proses pemetaan (\textit{mapping}), pengembangan algoritma lokal\-isasi, maupun optimasi perencanaan jalur global karena posisi robot diperoleh melalui mekanisme \textit{fake\_localization}.
+\item Penelitian difokuskan pada sistem navigasi robot beroda otonom yang beroperasi pada lingkungan indoor, dengan sensor yang digunakan terbatas pada LiDAR dua dimensi (LiDAR 2D) dan kamera termal, tanpa melibatkan sensor lain seperti kamera RGB, LiDAR tiga dimensi, radar, maupun sensor kedalaman.
+
+\item Data kamera termal digunakan untuk membentuk informasi traversability termal dan \textit{virtual LaserScan} sebagai pelengkap informasi LiDAR 2D, dengan fusi sensor dilakukan pada tingkat representasi traversability sehingga penelitian tidak membahas fusi data mentah (\textit{raw data fusion}) maupun fusi berbasis deteksi objek.
+
+\item Metode navigasi lokal yang digunakan adalah \textit{Artificial Potential Field} (APF) yang diimplementasikan sebagai \textit{local planner} pada ROS Navigation Stack, dengan parameter \textit{speed scale} dan \textit{repulsive gain} diatur secara adaptif oleh pengendali fuzzy Mamdani berdasarkan jarak obstacle terdekat dan nilai traversability efektif hasil fusi sensor.
+
+\item Pengujian dilakukan pada lingkungan simulasi menggunakan ROS Noetic dan Gazebo, sehingga penelitian tidak membahas implementasi pada robot fisik maupun pengaruh kondisi sensor nyata terhadap performa sistem.
+
+\item Evaluasi difokuskan pada aspek keselamatan dan performa navigasi yang meliputi \textit{Success Rate}, \textit{Collision-Free Rate}, \textit{minimum clearance}, waktu tempuh, panjang lintasan, serta karakteristik pergerakan robot, tanpa membahas proses pemetaan (\textit{mapping}), peng\-embangan algoritma lokalisasi, maupun optimasi perencanaan jalur global, karena posisi robot diperoleh melalui mekanisme \textit{fake\_localization}.
 \end{enumerate}
 
 

@@ -1,0 +1,14 @@
+{
+  "id": "session-1782928765083",
+  "startedAt": "2026-07-01T17:59:25.084Z",
+  "cwd": "/home/ubuntu/TA/Buku_TA_Elektro_ITS",
+  "context": {},
+  "metrics": {
+    "edits": 0,
+    "commands": 0,
+    "tasks": 0,
+    "errors": 0
+  },
+  "endedAt": "2026-07-01T18:19:16.303Z",
+  "duration": 1191219
+}
